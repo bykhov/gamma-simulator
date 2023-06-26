@@ -1,11 +1,13 @@
-from unet import unet_model4, unet_model3, unet_model2
-from utils import load_train_data, load_test_data, save_test_data
 import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# custom modules
+from models import unet_model, lstm_model
+from utils import load_train_data, load_test_data, save_test_data
 
 # %% Load data
 data_directory = 'D:/Google Drive/Research/2 Activity/database/'
@@ -16,7 +18,9 @@ learning_rate = 0.001
 print('frame_length:', sample_length)
 
 tf.keras.backend.clear_session()
-model = unet_model3(frame_length=sample_length)
+# model = unet_model(depth=3, frame_length=sample_length)
+model = lstm_model(sample_length=sample_length)
+
 model.compile(loss='sparse_categorical_crossentropy',
               optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
               metrics=['accuracy'])

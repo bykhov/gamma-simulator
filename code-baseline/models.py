@@ -4,8 +4,9 @@ from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense, \
     LSTM, Bidirectional, Reshape, Softmax, MaxPooling1D
 
 import tensorflow as tf
+from keras import Model
 
-# %% Model
+# %% U-Net model
 def Conv_Block(inputs, step, n_filters, kernel_size=3, dropout_prob=0.0):
     # 1D Convolutional Block
     x = tf.keras.layers.Conv1D(n_filters * 2 ** step, kernel_size, padding='causal')(inputs)
@@ -100,3 +101,37 @@ def unet_model2(frame_length, n_filters=16):
 
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
     return model
+
+
+def unet_model(depth=3, frame_length=1024, n_filters=16):
+    match depth:
+        case 3:
+            return unet_model3(frame_length, n_filters)
+        case 2:
+            return unet_model2(frame_length, n_filters)
+        case 4:
+            return unet_model4(frame_length, n_filters)
+        case _:  # default
+            raise ValueError(f'Invalid depth: {depth}')
+
+
+# %% LSTM Model
+def lstm_model(lstm_depth=1, inception_depth=2, filters=8, lstm_length=32, sample_length=1024):
+    """Create model"""
+    signal_input = Input(shape=[sample_length, 1], name='samples')
+    x = signal_input
+    for _ in range(inception_depth):
+        x11 = Conv1D(filters=filters, kernel_size=3, strides=1, padding='causal')(x)
+        x12 = Conv1D(filters=filters, kernel_size=5, strides=1, padding='causal')(x)
+        x13 = Conv1D(filters=filters, kernel_size=7, strides=1, padding='causal')(x)
+        x = Concatenate()([x11, x12, x13])
+        x = BatchNormalization()(x)
+        x = Activation('relu')(x)
+        x = Dropout(0.1)(x)
+
+    for _ in range(lstm_depth):
+        x = Bidirectional(LSTM(lstm_length, return_sequences=True))(x)
+
+    x = Dense(6, activation='sigmoid')(x)
+    new_model = Model(inputs=signal_input, outputs=x)
+    return new_model
