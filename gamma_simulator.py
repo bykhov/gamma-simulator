@@ -14,7 +14,7 @@ class gamma_simulator:
                  fs: float = 1,
                  dict_size: int = 100,
                  dict_type: str = 'double_exponential',
-                 dict_params=None,
+                 dict_shape_params=None,
                  noise: float = 0.01,
                  noise_unit='std',
                  seed: int = None,
@@ -31,7 +31,7 @@ class gamma_simulator:
         fs: sampling frequency in Hz
         dict_size: size of the dictionary
         dict_type: type of the dictionary (currently only double_exponential is supported)
-        dict_params: dictionary parameters (dictionary of parameters)
+        dict_shape_params: dictionary parameters (dictionary of parameters)
             for double_exponential:
                 tau1_mean: mean value of the first time constant
                 tau1_std: standard deviation of the first time constant
@@ -52,7 +52,7 @@ class gamma_simulator:
         # --- load the spectrum ---
         # hist_energy: energy values [keV] (bins, x-axis
         # hist_counts: amount of counts for each hist_energy value (y-axis)
-        if isinstance(energy_histogram,str):
+        if isinstance(energy_histogram, str):
             # load the spectrum from the database with isotope name = energy_histogram
             self.energy_desc = energy_histogram
             self.hist_energy, self.hist_counts = self.load_spectrum_data()
@@ -72,12 +72,15 @@ class gamma_simulator:
         # --- shape dictionary generation ---
         self.dict_size = dict_size
         self.dict_type = dict_type
-        if dict_params is None:
-            dict_params = {'tau1_mean': 0.01,
-                           'tau1_std': 0.001,
-                           'tau2_mean': 0.1,
-                           'tau2_std': 0.001}
-        self.dict_params = dict_params
+        if dict_shape_params is None:
+            if self.dict_type == 'double_exponential':
+                dict_shape_params = {'tau1_mean': 0.01,
+                                     'tau1_std': 0.001,
+                                     'tau2_mean': 0.1,
+                                     'tau2_std': 0.001}
+            else:
+                raise ValueError(f'Unknown shape type parameters for: {self.dict_type}')    
+        self.dict_shape_params = dict_shape_params
         # shape_len_sec: length of the shape in seconds
         # shape_len: length of the shape in samples
         # t_rise: rise time in seconds or samples
@@ -135,8 +138,8 @@ class gamma_simulator:
                   f'actual activity is {self.lambda_measured:.3f} events per sample')
             print(f'Shape model: {self.dict_type}')
             print(f'Number of {self.dict_type} shapes in the dictionary: {self.dict_size}')
-            print(f'Shape parameters: tau1 = {self.dict_params["tau1_mean"]}±{self.dict_params["tau1_std"]} '
-                  f'and tau2 = {self.dict_params["tau2_mean"]}±{self.dict_params["tau2_std"]}')
+            print(f'Shape parameters: tau1 = {self.dict_shape_params["tau1_mean"]}±{self.dict_shape_params["tau1_std"]}'
+                  f' and tau2 = {self.dict_shape_params["tau2_mean"]}±{self.dict_shape_params["tau2_std"]}')
             print(f'Each shape has a maximum length of {self.shape_len_sec * self.fs:.3f} samples '
                   f'rounded to {self.shape_len} samples')
             print(f'Rise time is {self.t_rise:.3f} samples and fall time is {self.t_fall:.3f} samples')
@@ -150,10 +153,11 @@ class gamma_simulator:
             print(f'Normalized lambda value: {self.lambda_n:.3e} events per sample')
             print(f'Shape model: {self.dict_type}')
             print(f'Number of {self.dict_type} shapes in the dictionary: {self.dict_size}')
-            print(f'Shape parameters: tau1 = {self.dict_params["tau1_mean"]} sec ±{self.dict_params["tau1_std"]:1.3e}'
-                  f' ({self.dict_params["tau1_mean"] * self.fs:.2f} samples) '
-                  f'and tau2 = {self.dict_params["tau2_mean"]} sec ±{self.dict_params["tau2_std"]:0.3e}'
-                  f' ({self.dict_params["tau2_mean"] * self.fs:.2f} samples) ')
+            print(f'Shape parameters: tau1 = {self.dict_shape_params["tau1_mean"]} '
+                  f'sec ±{self.dict_shape_params["tau1_std"]:1.3e}'
+                  f' ({self.dict_shape_params["tau1_mean"] * self.fs:.2f} samples) '
+                  f'and tau2 = {self.dict_shape_params["tau2_mean"]} sec ±{self.dict_shape_params["tau2_std"]:0.3e}'
+                  f' ({self.dict_shape_params["tau2_mean"] * self.fs:.2f} samples) ')
             print(f'Each shape has a maximum length of {self.shape_len_sec:1.3e} sec that are {self.shape_len} samples')
             print(f'Rise time is {self.t_rise:.3e} sec and fall time is {self.t_fall:.3e} sec')
         # duty cycle and pile-up probability
@@ -279,14 +283,15 @@ class gamma_simulator:
             shape_time: length of the shape in seconds
             t_rise: rise time in seconds (always)
         """
-        assert self.dict_params['tau2_mean'] > self.dict_params['tau1_mean'], "tau2 must be greater than tau1"
         if self.dict_type == 'double_exponential':
-            shape_time = 6 * (self.dict_params['tau2_mean'] + 3 * self.dict_params['tau2_std'])
+            assert self.dict_shape_params['tau2_mean'] > self.dict_shape_params['tau1_mean'], \
+                "tau2 must be greater than tau1"
+            shape_time = 6 * (self.dict_shape_params['tau2_mean'] + 3 * self.dict_shape_params['tau2_std'])
             shape_len = int(shape_time * self.fs)
             # calculate the rise time
-            tr = ((self.dict_params["tau1_mean"] * self.dict_params["tau2_mean"]) /
-                  (self.dict_params["tau1_mean"] + self.dict_params["tau2_mean"]) *
-                  np.log(self.dict_params["tau2_mean"] / self.dict_params["tau1_mean"]))
+            tr = ((self.dict_shape_params["tau1_mean"] * self.dict_shape_params["tau2_mean"]) /
+                  (self.dict_shape_params["tau1_mean"] + self.dict_shape_params["tau2_mean"]) *
+                  np.log(self.dict_shape_params["tau2_mean"] / self.dict_shape_params["tau1_mean"]))
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         return shape_len, shape_time, tr
@@ -298,8 +303,12 @@ class gamma_simulator:
         np.random.seed(self.seed)
         # generate random parameters
         # tau1values and tau2values are parameters for each shape in the dictionary
-        tau1values = np.random.normal(self.dict_params['tau1_mean'], self.dict_params['tau1_std'], self.dict_size)
-        tau2values = np.random.normal(self.dict_params['tau2_mean'], self.dict_params['tau2_std'], self.dict_size)
+        tau1values = np.random.normal(self.dict_shape_params['tau1_mean'],
+                                      self.dict_shape_params['tau1_std'],
+                                      self.dict_size)
+        tau2values = np.random.normal(self.dict_shape_params['tau2_mean'],
+                                      self.dict_shape_params['tau2_std'],
+                                      self.dict_size)
         assert np.all(tau1values > 0), "tau1 must be positive - please check the parameters"
         assert np.all(tau2values > 0), "tau2 must be positive - please check the parameters"
         # assign the parameters to events
@@ -403,4 +412,3 @@ class gamma_simulator:
         if self.verbose:
             self.verbose_info()
         return signal
-
