@@ -219,6 +219,9 @@ class gamma_simulator:
         return counts
 
     def find_nth_occurrence(self, char, n):
+        """
+        find the position where nth char occur in self.energy_desc
+        """
         if n > self.energy_desc.count(char):
             return len(self.energy_desc)
         else:
@@ -231,6 +234,12 @@ class gamma_simulator:
         """Load the gamma spectrum database from https://github.com/OpenGammaProject/Gamma-Spectrum-Database/
         energy_histogram: name of the energy_histogram
         return: tuple of hist_energy and counts, where counts are normalized to 1
+
+        Here is my main modification of multiple sources, the general idea is that when we simulate elements with ',' 
+        it represents more than one element, for multiple elements only change the probability density function, such as
+        "element1,pro1,element2,pro2"then the final probability density function is 
+        pro1 * element1 + pro2 * element2. 
+        The most code is determining where ',' is and extracting the element and probability
         """
         if self.energy_desc.find(',') == -1:
             url = ('https://raw.githubusercontent.com/bykhov/Gamma-Spectrum-Database/main/assets/spectra/'
@@ -359,6 +368,7 @@ class gamma_simulator:
                   np.log(self.dict_shape_params["tau2_mean"] / self.dict_shape_params["tau1_mean"]))
         elif self.dict_type == 'gamma_shape':
             shape_time = 6 * (1e-5 + 3 * 1e-7)
+            # gamma_shape parameters are not determined
             shape_len = int(shape_time * self.fs)
             tr = (0.01/0.001)*1e-7
         else:
