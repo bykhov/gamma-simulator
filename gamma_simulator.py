@@ -74,14 +74,14 @@ class gamma_simulator:
         self.dict_type = dict_type
         if dict_shape_params is None:
             if self.dict_type == 'double_exponential':
-                dict_shape_params = {'tau1_mean': 0.01,
-                                     'tau1_std': 0.001,
-                                     'tau2_mean': 0.1,
-                                     'tau2_std': 0.001}
+                dict_shape_params = {'tau1_mean': 1e-7,
+                                     'tau1_std': 1e-9,
+                                     'tau2_mean': 1e-5,
+                                     'tau2_std': 1e-7}
             elif self.dict_type == 'gamma_shape':
                 dict_shape_params = {'alpha_mean': 0.1,
                                      'alpha_std': 0.001,
-                                     'beta_mean': 0.001,
+                                     'beta_mean': 0.01,
                                      'beta_std': 0.001}
             else:
                 raise ValueError(f'Unknown shape type parameters for: {self.dict_type}')    
@@ -158,11 +158,21 @@ class gamma_simulator:
             print(f'Normalized lambda value: {self.lambda_n:.3e} events per sample')
             print(f'Shape model: {self.dict_type}')
             print(f'Number of {self.dict_type} shapes in the dictionary: {self.dict_size}')
-            print(f'Shape parameters: tau1 = {self.dict_shape_params["tau1_mean"]} '
-                  f'sec ±{self.dict_shape_params["tau1_std"]:1.3e}'
-                  f' ({self.dict_shape_params["tau1_mean"] * self.fs:.2f} samples) '
-                  f'and tau2 = {self.dict_shape_params["tau2_mean"]} sec ±{self.dict_shape_params["tau2_std"]:0.3e}'
-                  f' ({self.dict_shape_params["tau2_mean"] * self.fs:.2f} samples) ')
+            if self.dict_type == 'double_exponential':
+                print(f'Shape parameters: tau1 = {self.dict_shape_params["tau1_mean"]} '
+                    f'sec ±{self.dict_shape_params["tau1_std"]:1.3e}'
+                    f' ({self.dict_shape_params["tau1_mean"] * self.fs:.2f} samples) '
+                    f'and tau2 = {self.dict_shape_params["tau2_mean"]} sec ±{self.dict_shape_params["tau2_std"]:0.3e}'
+                    f' ({self.dict_shape_params["tau2_mean"] * self.fs:.2f} samples) ')
+            elif self.dict_type == 'gamma_shape':
+                print(f'Shape parameters: alpha = {self.dict_shape_params["alpha_mean"]} '
+                    f'sec ±{self.dict_shape_params["alpha_std"]:1.3e}'
+                    f' ({self.dict_shape_params["alpha_mean"] * self.fs:.2f} samples) '
+                    f'and neta = {self.dict_shape_params["beta_mean"]} sec ±{self.dict_shape_params["beta_std"]:0.3e}'
+                    f' ({self.dict_shape_params["beta_mean"] * self.fs:.2f} samples) ')
+            else:
+                raise ValueError(f'Unknown shape type parameters for: {self.dict_type}')
+
             print(f'Each shape has a maximum length of {self.shape_len_sec:1.3e} sec that are {self.shape_len} samples')
             print(f'Rise time is {self.t_rise:.3e} sec and fall time is {self.t_fall:.3e} sec')
         # duty cycle and pile-up probability
@@ -367,10 +377,11 @@ class gamma_simulator:
                   (self.dict_shape_params["tau1_mean"] + self.dict_shape_params["tau2_mean"]) *
                   np.log(self.dict_shape_params["tau2_mean"] / self.dict_shape_params["tau1_mean"]))
         elif self.dict_type == 'gamma_shape':
+            # shape_time need to be changed it relies on alpha and beta
             shape_time = 6 * (1e-5 + 3 * 1e-7)
             # gamma_shape parameters are not determined
             shape_len = int(shape_time * self.fs)
-            tr = (0.01/0.001)*1e-7
+            tr = (self.dict_shape_params["alpha_mean"]/self.dict_shape_params["beta_mean"])*1e-7
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         return shape_len, shape_time, tr
@@ -432,8 +443,12 @@ class gamma_simulator:
         np.random.seed(self.seed)
         # generate random parameters
         # alphavalues and betavalues are now certain
-        alphavalues = np.random.normal(0.1, 0.001, self.dict_size)
-        betavalues = np.random.normal(0.01, 0.001, self.dict_size)
+        alphavalues = np.random.normal(self.dict_shape_params['alpha_mean'],
+                                      self.dict_shape_params['alpha_std'],
+                                      self.dict_size)
+        betavalues = np.random.normal(self.dict_shape_params['beta_mean'],
+                                      self.dict_shape_params['beta_std'],
+                                      self.dict_size)
         assert np.all(alphavalues > 0), "alpha must be positive - please check the parameters"
         assert np.all(betavalues > 0), "beta must be positive - please check the parameters"
         # assign the parameters to events
