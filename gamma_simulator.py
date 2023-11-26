@@ -13,7 +13,7 @@ class gamma_simulator:
                  lambda_value: float = 0.1,
                  fs: float = 1,
                  dict_size: int = 100,
-                 dict_type: str = 'double_exponential',
+                 dict_type: str = 'gamma_shape',
                  dict_shape_params=None,
                  noise: float = 0.01,
                  noise_unit='std',
@@ -78,6 +78,11 @@ class gamma_simulator:
                                      'tau1_std': 0.001,
                                      'tau2_mean': 0.1,
                                      'tau2_std': 0.001}
+            elif self.dict_type == 'gamma_shape':
+                dict_shape_params = {'alpha_mean': 0.1,
+                                     'alpha_std': 0.001,
+                                     'beta_mean': 0.001,
+                                     'beta_std': 0.001}
             else:
                 raise ValueError(f'Unknown shape type parameters for: {self.dict_type}')    
         self.dict_shape_params = dict_shape_params
@@ -213,7 +218,7 @@ class gamma_simulator:
         counts = counts / counts.sum()
         return counts
 
-        def find_nth_occurrence(self, char, n):
+    def find_nth_occurrence(self, char, n):
         if n > self.energy_desc.count(char):
             return len(self.energy_desc)
         else:
@@ -346,14 +351,14 @@ class gamma_simulator:
             t_rise: rise time in seconds (always)
         """
         if self.dict_type == 'double_exponential':
-            shape_time = 6 * (self.dict_params['tau2_mean'] + 3 * self.dict_params['tau2_std'])
+            shape_time = 6 * (self.dict_shape_params['tau2_mean'] + 3 * self.dict_shape_params['tau2_std'])
             shape_len = int(shape_time * self.fs)
             # calculate the rise time
-            tr = ((self.dict_params["tau1_mean"] * self.dict_params["tau2_mean"]) /
-                  (self.dict_params["tau1_mean"] + self.dict_params["tau2_mean"]) *
-                  np.log(self.dict_params["tau2_mean"] / self.dict_params["tau1_mean"]))
+            tr = ((self.dict_shape_params["tau1_mean"] * self.dict_shape_params["tau2_mean"]) /
+                  (self.dict_shape_params["tau1_mean"] + self.dict_shape_params["tau2_mean"]) *
+                  np.log(self.dict_shape_params["tau2_mean"] / self.dict_shape_params["tau1_mean"]))
         elif self.dict_type == 'gamma_shape':
-            shape_time = 6 * (self.dict_params['tau2_mean'] + 3 * self.dict_params['tau2_std'])
+            shape_time = 6 * (1e-5 + 3 * 1e-7)
             shape_len = int(shape_time * self.fs)
             tr = (0.01/0.001)*1e-7
         else:
@@ -412,15 +417,15 @@ class gamma_simulator:
     # the parameters of the gamma shape are undetermined
     def generate_gamma_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
         """Generate random parameters for the gamma shape.
-        return: tuple of tau1 and tau2 are shape parameters for each event in the signal
+        return: tuple of alpha and beta are shape parameters for each event in the signal
         """
         np.random.seed(self.seed)
         # generate random parameters
-        # tau1values and tau2values are parameters for each shape in the dictionary
+        # alphavalues and betavalues are now certain
         alphavalues = np.random.normal(0.1, 0.001, self.dict_size)
         betavalues = np.random.normal(0.01, 0.001, self.dict_size)
-        assert np.all(alphavalues > 0), "tau1 must be positive - please check the parameters"
-        assert np.all(betavalues > 0), "tau2 must be positive - please check the parameters"
+        assert np.all(alphavalues > 0), "alpha must be positive - please check the parameters"
+        assert np.all(betavalues > 0), "beta must be positive - please check the parameters"
         # assign the parameters to events
         # sample from the dictionary for each event
         # reshape to column vector for broadcasting
@@ -428,7 +433,7 @@ class gamma_simulator:
         beta = np.random.choice(betavalues, size=self.n_events, replace=True).reshape(-1, 1)
         return alpha, beta
     def generate_gamma_shape_dict(self) -> np.ndarray:
-        """Generate a double exponential shape dictionary.
+        """Generate a gammma shape dictionary.
         Shape is generated for each event in the signal.
         """
         # generate random parameters
