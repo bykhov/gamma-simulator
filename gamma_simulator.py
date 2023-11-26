@@ -213,32 +213,94 @@ class gamma_simulator:
         counts = counts / counts.sum()
         return counts
 
+        def find_nth_occurrence(self, char, n):
+        if n > self.energy_desc.count(char):
+            return len(self.energy_desc)
+        else:
+            start = self.energy_desc.find(char)
+            while start >= 0 and n > 1:
+                start = self.energy_desc.find(char, start + len(char))
+                n -= 1
+            return start
     def load_spectrum_data(self) -> tuple[np.ndarray, np.ndarray]:
         """Load the gamma spectrum database from https://github.com/OpenGammaProject/Gamma-Spectrum-Database/
         energy_histogram: name of the energy_histogram
         return: tuple of hist_energy and counts, where counts are normalized to 1
         """
-        url = ('https://raw.githubusercontent.com/bykhov/Gamma-Spectrum-Database/main/assets/spectra/'
-               + self.energy_desc
-               + '.html')
-        try:
-            html_page = urllib.request.urlopen(url).read()
-        except urllib.error.HTTPError:
-            raise ValueError(f'Unknown isotope name: {self.energy_desc}')
+        if self.energy_desc.find(',') == -1:
+            url = ('https://raw.githubusercontent.com/bykhov/Gamma-Spectrum-Database/main/assets/spectra/'
+                   + self.energy_desc
+                   + '.html')
+            try:
+                html_page = urllib.request.urlopen(url).read()
+            except urllib.error.HTTPError:
+                raise ValueError(f'Unknown isotope name: {self.energy_desc}')
 
-        # parse the html page and extract the spectrum
-        page = str(html_page)
-        start_idx = page.find('Clean Spectrum')
-        x_idx = page.find('"x":', start_idx) + 5
-        x_str = page[x_idx:page.find(']', x_idx)]
-        x = np.fromstring(x_str, sep=',')
-        y_idx = page.find('"y":', x_idx) + 5
-        y_str = page[y_idx:page.find(']', y_idx)]
-        y = np.fromstring(y_str, sep=',')
-        y[y < 0] = 0  # remove weird negative values
-        energy, counts = x, self.normalize_spectrum_histogram(y)
+            # parse the html page and extract the spectrum
+            page = str(html_page)
+            start_idx = page.find('Clean Spectrum')
+            x_idx = page.find('"x":', start_idx) + 5
+            x_str = page[x_idx:page.find(']', x_idx)]
+            x = np.fromstring(x_str, sep=',')
+            y_idx = page.find('"y":', x_idx) + 5
+            y_str = page[y_idx:page.find(']', y_idx)]
+            y = np.fromstring(y_str, sep=',')
+            y[y < 0] = 0  # remove weird negative values
+            energy, counts = x, self.normalize_spectrum_histogram(y)
+        else:
+            countstemp = []
+            url = ('https://raw.githubusercontent.com/bykhov/Gamma-Spectrum-Database/main/assets/spectra/'
+                   + self.energy_desc[0:self.energy_desc.find(',')]
+                   + '.html')
+            try:
+                html_page = urllib.request.urlopen(url).read()
+            except urllib.error.HTTPError:
+                raise ValueError(f'Unknown isotope name: {self.energy_desc}')
+
+            # parse the html page and extract the spectrum
+            page = str(html_page)
+            start_idx = page.find('Clean Spectrum')
+            x_idx = page.find('"x":', start_idx) + 5
+            x_str = page[x_idx:page.find(']', x_idx)]
+            x = np.fromstring(x_str, sep=',')
+            y_idx = page.find('"y":', x_idx) + 5
+            y_str = page[y_idx:page.find(']', y_idx)]
+            y = np.fromstring(y_str, sep=',')
+            y[y < 0] = 0  # remove weird negative values
+            energy = x
+            countstemp.append(self.normalize_spectrum_histogram(y))
+            i = 1
+            while i < self.energy_desc.count(',')/2:
+                url = ('https://raw.githubusercontent.com/bykhov/Gamma-Spectrum-Database/main/assets/spectra/'
+                       + self.energy_desc[self.find_nth_occurrence(',',2*i) + 1
+                                          :self.find_nth_occurrence(',', 2*i+1)]
+                       + '.html')
+                try:
+                    html_page = urllib.request.urlopen(url).read()
+                except urllib.error.HTTPError:
+                    raise ValueError(f'Unknown isotope name: {self.energy_desc}')
+
+                # parse the html page and extract the spectrum
+                page = str(html_page)
+                start_idx = page.find('Clean Spectrum')
+                x_idx = page.find('"x":', start_idx) + 5
+                x_str = page[x_idx:page.find(']', x_idx)]
+                x = np.fromstring(x_str, sep=',')
+                y_idx = page.find('"y":', x_idx) + 5
+                y_str = page[y_idx:page.find(']', y_idx)]
+                y = np.fromstring(y_str, sep=',')
+                y[y < 0] = 0  # remove weird negative values
+                energy = x
+                countstemp.append(self.normalize_spectrum_histogram(y))
+                i = i+1
+            i = 0
+            counts = np.zeros(len(energy))
+            while i < self.energy_desc.count(',')/2:
+                counts = counts + countstemp[i]*float(self.energy_desc[self.find_nth_occurrence(',', 2*i+1)+1:
+                                                                 self.find_nth_occurrence(',', 2*i+2)])
+
+                i = i+1
         return energy, counts
-
     # --- Time ---------------------------------------------------------------
     def generate_arrival_times(self,
                                outage_prob: float = 1e-12) -> np.ndarray:
@@ -284,14 +346,16 @@ class gamma_simulator:
             t_rise: rise time in seconds (always)
         """
         if self.dict_type == 'double_exponential':
-            assert self.dict_shape_params['tau2_mean'] > self.dict_shape_params['tau1_mean'], \
-                "tau2 must be greater than tau1"
-            shape_time = 6 * (self.dict_shape_params['tau2_mean'] + 3 * self.dict_shape_params['tau2_std'])
+            shape_time = 6 * (self.dict_params['tau2_mean'] + 3 * self.dict_params['tau2_std'])
             shape_len = int(shape_time * self.fs)
             # calculate the rise time
-            tr = ((self.dict_shape_params["tau1_mean"] * self.dict_shape_params["tau2_mean"]) /
-                  (self.dict_shape_params["tau1_mean"] + self.dict_shape_params["tau2_mean"]) *
-                  np.log(self.dict_shape_params["tau2_mean"] / self.dict_shape_params["tau1_mean"]))
+            tr = ((self.dict_params["tau1_mean"] * self.dict_params["tau2_mean"]) /
+                  (self.dict_params["tau1_mean"] + self.dict_params["tau2_mean"]) *
+                  np.log(self.dict_params["tau2_mean"] / self.dict_params["tau1_mean"]))
+        elif self.dict_type == 'gamma_shape':
+            shape_time = 6 * (self.dict_params['tau2_mean'] + 3 * self.dict_params['tau2_std'])
+            shape_len = int(shape_time * self.fs)
+            tr = (0.01/0.001)*1e-7
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         return shape_len, shape_time, tr
@@ -345,7 +409,51 @@ class gamma_simulator:
             plt.axis('tight')
             plt.show()
         return s
-
+    # the parameters of the gamma shape are undetermined
+    def generate_gamma_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
+        """Generate random parameters for the gamma shape.
+        return: tuple of tau1 and tau2 are shape parameters for each event in the signal
+        """
+        np.random.seed(self.seed)
+        # generate random parameters
+        # tau1values and tau2values are parameters for each shape in the dictionary
+        alphavalues = np.random.normal(0.1, 0.001, self.dict_size)
+        betavalues = np.random.normal(0.01, 0.001, self.dict_size)
+        assert np.all(alphavalues > 0), "tau1 must be positive - please check the parameters"
+        assert np.all(betavalues > 0), "tau2 must be positive - please check the parameters"
+        # assign the parameters to events
+        # sample from the dictionary for each event
+        # reshape to column vector for broadcasting
+        alpha = np.random.choice(alphavalues, size=self.n_events, replace=True).reshape(-1, 1)
+        beta = np.random.choice(betavalues, size=self.n_events, replace=True).reshape(-1, 1)
+        return alpha, beta
+    def generate_gamma_shape_dict(self) -> np.ndarray:
+        """Generate a double exponential shape dictionary.
+        Shape is generated for each event in the signal.
+        """
+        # generate random parameters
+        self.alpha, self.beta = self.generate_gamma_shape_parameters()
+        # define x-axis values:
+        # dimension 0 is the number of shapes, dimension 1 is the number of samples
+        # each start time is shifted by the arrival time of the event
+        n = np.r_[0:self.shape_len] - np.reshape(self.times / self.dt % 1.0, (-1, 1))
+        s = (abs(n)**self.alpha)*np.exp(-self.beta*n)
+        s[:, 0] = 0  # set the first sample to zero
+        # normalize the shape
+        s /= s.sum(axis=1, keepdims=True)
+        if self.verbose_plots:
+            # plot the shapes without random start times
+            n_plot = np.r_[0:self.shape_len]
+            s_plot = n_plot**self.alpha*np.exp(-self.beta*n_plot)
+            plt.plot(n_plot, s_plot.T, alpha=0.25)
+            plt.grid(linestyle='--', linewidth=1, color='gray')
+            plt.xlabel('Time [n]')
+            plt.ylabel('Amplitude')
+            plt.title(f'Shapes in the pulse shapes dictionary')
+            plt.xlim([0, self.shape_len])
+            plt.axis('tight')
+            plt.show()
+        return s
     # --- Signal -------------------------------------------------------------
     # Signal is generated without enforcing the edges and then the edges are truncated if needed
     def generate_signal_without_noise(self) -> np.ndarray:
@@ -354,6 +462,8 @@ class gamma_simulator:
         # generate the dictionary
         if self.dict_type == 'double_exponential':
             s = self.generate_double_exponent_shape_dict()
+        elif self.dict_type == 'gamma_shape':
+            s = self.generate_gamma_shape_dict()
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         # generate the signal
