@@ -1,3 +1,5 @@
 
 *.mat
 database/desktop.ini
+.idea/
+__pycache__/
