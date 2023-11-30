@@ -3,6 +3,8 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 import urllib
 import warnings
+import urllib.request
+import urllib.error
 
 
 # Classes
@@ -107,9 +109,9 @@ class gamma_simulator:
                                      'mean2': 10,  # tau2
                                      'std2': 0.1}
             elif self.dict_type == 'gamma':
-                dict_shape_params = {'mean1': 5,  # alpha
+                dict_shape_params = {'mean1': 1.1,  # alpha
                                      'std1': 0.001,
-                                     'mean2': 1,  # beta
+                                     'mean2': 0.1,  # beta
                                      'std2': 0.001}
         self.dict_shape_params = dict_shape_params
         # non-random shape parameters
@@ -349,7 +351,8 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            shape_time = 6 * self.dict_shape_params['mean1']  #todo check
+            shape_time = shape_time = stats.gamma.ppf(0.995,self.dict_shape_params['mean1'],
+                                         scale = 1/self.dict_shape_params['mean2']) #todo check
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
         else:
@@ -395,7 +398,8 @@ class gamma_simulator:
             s[:, 0] = 0  # set the first sample to zero
         elif self.dict_type == 'gamma':
             # n[:, 0] = 0
-            s = stats.gamma.pdf(n * self.dt, self.param1 - 1, scale=1 / self.param2)
+            s = stats.gamma.pdf(n * self.dt, self.param1, scale=1 / self.param2)
+            # If the built-in function is used, the parameter is automatically subtracted by one,
             # s = ((n * self.dt) ** self.param1) * np.exp(-self.param2 * n * self.dt)
         # normalize the shape
         s /= s.sum(axis=1, keepdims=True)
@@ -404,8 +408,8 @@ class gamma_simulator:
             n_plot = np.r_[0:self.shape_len]
             if self.dict_type == 'double_exponential':
                 s_plot = np.exp(-n_plot * self.dt / self.param2) - np.exp(-n_plot * self.dt / self.param1)
-            elif self.dict_type == 'gamma':
-                s_plot = ((n_plot * self.dt) ** self.param1) * np.exp(-self.param2 * n_plot * self.dt)
+            elif self.dict_type == 'gamma':  # The drawing should be manually subtracted by one
+                s_plot = ((n_plot * self.dt) ** (self.param1-1)) * np.exp(-self.param2 * n_plot * self.dt)
             plt.plot(n_plot, s_plot.T, alpha=0.25)
             plt.grid(linestyle='--', linewidth=1, color='gray')
             plt.xlabel('Discrete time [n]')
@@ -479,7 +483,6 @@ class gamma_simulator:
         if self.verbose:
             self.verbose_info()
         return signal
-
 
 if __name__ == '__main__':
     simulator = gamma_simulator()
