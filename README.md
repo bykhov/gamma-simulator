@@ -6,7 +6,7 @@ Make sure you have the following libraries in your environment
 * numpy
 * scipy
 * matplotlib
-* urllib
+* urllib  
 You can use the following command to install the libaries
 ```bash
 pip install numpy scipy matplotlib urllib
