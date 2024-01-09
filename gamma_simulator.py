@@ -20,6 +20,8 @@ class gamma_simulator:
                  noise: float = 0.01,
                  noise_unit='std',
                  seed: int = None,
+                 spectrum_range = 3000,
+                 spectrum_bin = 3000,
                  enforce_edges: bool = True,
                  verbose: bool = False,
                  verbose_plots: dict = None):
@@ -59,6 +61,7 @@ class gamma_simulator:
         verbose_plots['energy'] = verbose_plots.get('energy', False)
         verbose_plots['shapes'] = verbose_plots.get('shapes', False)
         verbose_plots['signal'] = verbose_plots.get('signal', False)
+        verbose_plots['spectrum'] = verbose_plots.get('spectrum', False)
         if source is None:
             source = 'Co-60'
         self.verbose = verbose
@@ -145,6 +148,8 @@ class gamma_simulator:
         # calculate the duty cycle
         self.duty_cycle = self.lambda_value * self.shape_len_sec
         # parameters of the signal (will be calculated later)
+        self.spectrum_range = spectrum_range
+        self.spectrum_bin = spectrum_bin
         self.lambda_measured = None
         self.energies = None
         self.n_events = None
@@ -351,8 +356,8 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            shape_time = stats.gamma.ppf(0.995,self.dict_shape_params['mean1'],
-                                         scale = 1/self.dict_shape_params['mean2'])
+            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'],
+                                         scale=1/self.dict_shape_params['mean2']) #todo check
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
         else:
@@ -429,6 +434,7 @@ class gamma_simulator:
         s = self.generate_shape_dict
         # generate the signal
         signal = np.zeros(self.signal_len)
+        p = 0
         for i in range(self.n_events):
             # for each event
             # add the shape to the signal
@@ -452,6 +458,34 @@ class gamma_simulator:
         # add noise to the signal
         signal += noise
         return signal
+
+    def generate_spectrum(self,s):
+        """
+        :param s: signal
+        :return: spectrum for the signal
+        """
+        spectrum = []
+        for i in range(self.spectrum_bin):
+            spectrum.append(0)
+        energy = []
+        energy_temp = 0
+        i = 0
+        while i < len(s) - 5000:
+            while s[i] < 20*self.noise:
+                i += 1
+            while s[i] > 20*self.noise:
+                energy_temp += s[i]
+                i += 1
+            if energy_temp < self.spectrum_range:
+                energy.append(energy_temp)
+            energy_temp = 0
+        step = self.spectrum_range / self.spectrum_bin
+        spectrum_energy = [x / step for x in energy]
+        for i in range(len(energy) - 1):
+            spectrum[int(spectrum_energy[i])] += 1
+        for i in range(self.spectrum_bin):
+            spectrum[i] = spectrum[i] / len(energy)
+        return spectrum
 
     def generate_signal(self) -> np.ndarray:
         # times: event times
@@ -477,6 +511,19 @@ class gamma_simulator:
             plt.xlabel('Time [n]')
             plt.ylabel('Signal amplitude')
             plt.title(f'Signal with additive noise')
+            plt.axis('tight')
+            plt.grid()
+            plt.show()
+        if self.verbose_plots['spectrum']:
+            spectrum = self.generate_spectrum(signal)
+            if len(signal) < 5000:
+                print("There are too few sampling points")
+            else:
+                plt.plot(spectrum)
+                plt.title(f'Spectrum')
+            plt.xlabel('Energy(KeV)')
+            plt.ylabel('Probability')
+            plt.title(f'Spectrum')
             plt.axis('tight')
             plt.grid()
             plt.show()
