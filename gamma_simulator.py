@@ -357,7 +357,7 @@ class gamma_simulator:
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
             shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'],
-                                         scale=1/self.dict_shape_params['mean2']) #todo check
+                                         scale=1/self.dict_shape_params['mean2'])
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
         else:
@@ -434,7 +434,7 @@ class gamma_simulator:
         s = self.generate_shape_dict
         # generate the signal
         signal = np.zeros(self.signal_len)
-        p = 0
+
         for i in range(self.n_events):
             # for each event
             # add the shape to the signal
