@@ -82,11 +82,11 @@ Our simulator supports drawing a variety of graphs, including energy, shape, sig
 * Energy：Ideal energy spectrum of the drawn signal source (simulator built-in database)
 * Shape：Draws a dictionary set of all possible signal shapes
 * Signal：When the length of the resulting signal is less than 2000, the generated signal is drawn, and when the length is greater than 2000, the first 2000 sampling points are drawn
-* Spectrum：Energy spectrum of the analog signal, including pulse stacking
+
 
 The default option is not to draw, if you need to draw, you need to change the specified value in the parameter definition to True
 ```
-verbose_plots={'energy':True, 'shapes': True, 'signal': True, 'spectrum':True}
+verbose_plots={'energy':True, 'shapes': True, 'signal': True}
 ```
 ## Examples
 ```python
