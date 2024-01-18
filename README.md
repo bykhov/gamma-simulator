@@ -57,9 +57,7 @@ signal = simulator.generate_signal()
   _Shapes : pulse shapes_  
   _Energy : The energy spectrum of the simulated element_  
   _Signal : The simulated signal_
-### spectrum
-* spectrum_range:The maximum range of the energy spectrum(KeV)
-* spectrum_bin:The bin number of the X-axis of the energy spectrum
+
   
 
 ## Notice
