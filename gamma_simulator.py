@@ -38,7 +38,7 @@ class gamma_simulator:
         lambda_value: event rate in Hz (events per second)
         fs: sampling frequency in Hz
         dict_size: size of the dictionary
-        dict_type: type of the dictionary (currently only double_exponential is supported)
+        dict_type: type of the dictionary (currently only "double_exponential" and "gamma" are supported)
         dict_shape_params: dictionary parameters (dictionary of parameters)
             for double_exponential:
                 mean1: mean value of the first time constant
@@ -134,10 +134,12 @@ class gamma_simulator:
         if self.signal_len < self.shape_len:
             raise ValueError(f'Signal length must be greater than the shape length,'
                              f' but signal_len = {self.signal_len} and shape_len = {self.shape_len}')
-        if not self.enforce_edges:
+        if self.enforce_edges:
+            self.signal_len_samples = self.signal_len
+        else:
             # The shape is DO allowed to exceed the signal boundaries
-            # The signal is extended by 2 * shape_len_sec
-            self.signal_len += self.shape_len * 2
+            # The generated signal is extended by 2 * shape_len_sec and then truncated back to signal_len
+            self.signal_len_samples = self.signal_len + self.shape_len * 2
 
         self.noise = noise
         assert noise_unit in ['std', 'snr'], "Unknown noise unit"
@@ -300,9 +302,9 @@ class gamma_simulator:
     def generate_arrival_times(self,
                                outage_prob: float = 1e-12) -> np.ndarray:
         """Generate a sequence of events with a given number of samples and events rate.
-        signal_len: length of the signal in samples
+        signal_len_samples: length of the signal in samples
         lambda_n: event rate in event/sample
-        outage_prob: probability of missing events in a frame of length signal_len (not used)
+        outage_prob: probability of missing events in a frame of length signal_len_samples (not used)
         return: array of arrival times
         """
         # vector implementation does not check for number of events through a loop (!)
@@ -311,11 +313,12 @@ class gamma_simulator:
 
         np.random.seed(self.seed)
         # number of events in a frame to guarantee outage probability
-        max_number_of_events = stats.poisson.ppf(1 - outage_prob, mu=self.lambda_n * self.signal_len).astype(int)
+        max_number_of_events = stats.poisson.ppf(1 - outage_prob, mu=self.lambda_n * self.signal_len_samples).astype(
+            int)
         # generate events times
         times = np.cumsum(np.random.exponential(1 / self.lambda_n, max_number_of_events))
         # remove events after the end of the frame
-        times = times[times < self.signal_len - self.shape_len]
+        times = times[times < self.signal_len_samples - self.shape_len]
         return times
 
     def generate_energy_distribution(self) -> np.ndarray:
@@ -351,8 +354,8 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            shape_time = stats.gamma.ppf(0.995,self.dict_shape_params['mean1'],
-                                         scale = 1/self.dict_shape_params['mean2'])
+            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'],
+                                         scale=1 / self.dict_shape_params['mean2'])
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
         else:
@@ -409,7 +412,7 @@ class gamma_simulator:
             if self.dict_type == 'double_exponential':
                 s_plot = np.exp(-n_plot * self.dt / self.param2) - np.exp(-n_plot * self.dt / self.param1)
             elif self.dict_type == 'gamma':  # The drawing should be manually subtracted by one
-                s_plot = ((n_plot * self.dt) ** (self.param1-1)) * np.exp(-self.param2 * n_plot * self.dt)
+                s_plot = ((n_plot * self.dt) ** (self.param1 - 1)) * np.exp(-self.param2 * n_plot * self.dt)
             plt.plot(n_plot, s_plot.T, alpha=0.25)
             plt.grid(linestyle='--', linewidth=1, color='gray')
             plt.xlabel('Discrete time [n]')
@@ -428,7 +431,7 @@ class gamma_simulator:
         # generate the dictionary
         s = self.generate_shape_dict
         # generate the signal
-        signal = np.zeros(self.signal_len)
+        signal = np.zeros(self.signal_len_samples)
         for i in range(self.n_events):
             # for each event
             # add the shape to the signal
@@ -447,7 +450,7 @@ class gamma_simulator:
             noise_std = self.noise
         else:  # if self.noise_unit == 'snr':
             noise_std = 10 ** (-self.noise / 20) * np.linalg.norm(signal) / np.sqrt(len(signal))
-        noise = np.random.normal(0, scale=noise_std, size=self.signal_len)
+        noise = np.random.normal(0, scale=noise_std, size=self.signal_len_samples)
         self.measured_snr = 20 * np.log10(np.linalg.norm(signal) / np.linalg.norm(noise))
         # add noise to the signal
         signal += noise
@@ -484,11 +487,12 @@ class gamma_simulator:
             self.verbose_info()
         return signal
 
+
 if __name__ == '__main__':
     simulator = gamma_simulator()
     s = simulator.generate_signal()
     simulator.verbose_info()
-# # %%
+    # # %%
     simulator = gamma_simulator(verbose=True,
                                 verbose_plots={'signal': True},
                                 source={'name': ['Co-60', 'I-125'], 'weights': [1, 2]},
@@ -506,7 +510,7 @@ if __name__ == '__main__':
                                 seed=42)
     s = simulator.generate_signal()
 
-    #%%
+    # %%
     simulator = gamma_simulator(verbose=True,
                                 verbose_plots={'shapes': True, 'signal': True},
                                 source={'name': 'Co-60', 'weights': 1},
@@ -515,5 +519,6 @@ if __name__ == '__main__':
                                 noise_unit='std',
                                 noise=1e-3,
                                 dict_size=10,
+                                enforce_edges=False,
                                 seed=42)
     s = simulator.generate_signal()
