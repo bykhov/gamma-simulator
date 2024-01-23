@@ -3,7 +3,7 @@
      
 This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/) in China.Here we will give a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#Use) to see how to use it**.For any questions about the software, you can leave a message or send an email to me, I will reply as soon as possilble
 
-## Intorduction
+## Introduction
 ### What is Gamma Simulator?
 
 Gamma simulator is a gamma pulse simulator with parameter customization function, you can specify the type of radioactive source and pulse count rate and other characteristics, generate pulse signals that meet the corresponding characteristics
