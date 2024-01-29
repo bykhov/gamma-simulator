@@ -552,7 +552,7 @@ class gamma_simulator:
         else:  # if self.noise_unit == 'snr':
             noise_std = 10 ** (-self.noise / 20) * np.linalg.norm(signal) / np.sqrt(len(signal))
         noise = np.random.normal(0, scale=noise_std, size=self.signal_len_samples)
-        self.measured_snr = 20 * np.log10(np.linalg.norm(signal) / np.linalg.norm(noise))
+        self.measured_snr = 20 * (np.log10(np.linalg.norm(signal)) - np.log10(np.linalg.norm(noise)))
         # add noise to the signal
         signal += noise
         return signal
