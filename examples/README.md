@@ -1,20 +1,3 @@
-<!--- Duplicated from the main readme.
-This is a specific introduction examples of the file，First let's look at the parameters we can change mainly:
-|Parameter name  |Parameter description|
-| --- | -----------|
-| verbose   | Whether to output detailed information   |
-| verbose_plots   | Whether images need to be output   |
-| source   | The simulated radioactive source   |
-| signal_len   | Length of time to simulate sampling(s)   |
-| fs   | Analog sampling rate   |
-| lambda_value   | Analog pulse count rate(cps)   |
-| dict_type    | Shape type model of the simulated pulse   |
-| dict_shape_params   | dict shape params   |
-| noise_unit   | Unit of noise   |
-| noise   | The magnitude of noise in the given unit   |
-| dict_size   | Shape dictionary size due to jitter   |
-| seed   | The simulated random number seed   | -->
-
 ## Examples and tests
 * *Default parameters test in [defult_test](defult_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
 **Zikang** please add all the numeric class parameter outputs to this code.
