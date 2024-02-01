@@ -7,7 +7,7 @@ The signal is a raw HPGe measurement signal. The signal is 1 second long and has
 * Example of a saturated peak
 * Example of a detector's dead time.
 
-![<img src="signal_excerpt.png" width="150"/>](signal_excerpt.png "Signal excerpt")
+<img src="signal_excerpt.png" width="400"/>
 
 ### Signal pre-processing
 The signal pre-processing in [signal_analysis.ipynb](signal_analysis.ipynb) includes the following steps.
@@ -29,22 +29,21 @@ The saturation level corresponds to the highest value represented by `unit16` fo
 
 #### Summary
 The resulting signal is presented below.
-![<img src="signal_segments_examples.png" width="150"/>](signal_segments_examples.png "Signal segments examples")
+<img src="signal_segments_examples.png" width="400"/>
 
 ### Fitting
 * All the segments were fitted with gamma shape MSE fit. The fitting examples are presented below. Note fitting takes a few minutes to run.
-
-![Fit examples](signal_segments_fitting_gamma.png "Fitting examples")
+<img src="signal_segments_fitting_gamma.png" width="400"/>
 
 * Fitting results clean-up: The segments with abnormally high-cost function values and outliers of $\alpha$ and $\beta$ were removed.
 
 * The resulting distribution of the fitted $\alpha$ and $\beta$ parameters is stored for further simulation and is presented below.
 
-![parameter histograms](alpha_beta_param.png "$\alpha$ and $\beta$ histograms")
+<img src="alpha_beta_param.png" width="400"/>
 
 * The resulting energy histogram for 512 is stored for further simulation and is presented below. 
 
-![Energy histogram](signal_energy_histogram.png "Energy histogram") 
+<img src="signal_energy_histogram.png" width="400"/>
 
 ### Simulation
 The simulation is performed with parameters $\alpha$ and $\beta$ and the energy histogram that was precalculated from the experimentally measured signal in [signal_analysis_sim.py](signal_analysis_sim.py) file.
