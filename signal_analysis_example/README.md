@@ -29,11 +29,13 @@ The saturation level corresponds to the highest value represented by `unit16` fo
 
 #### Summary
 The resulting signal is presented below.
+
 <img src="signal_segments_examples.png" width="400"/>
 
 ### Fitting
 * All the segments were fitted with gamma shape MSE fit. The fitting examples are presented below. Note fitting takes a few minutes to run.
-<img src="signal_segments_fitting_gamma.png" width="400"/>
+* 
+<img src="signal_segments_fitting_gamma.png" width="300"/>
 
 * Fitting results clean-up: The segments with abnormally high-cost function values and outliers of $\alpha$ and $\beta$ were removed.
 
