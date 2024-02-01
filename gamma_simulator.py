@@ -135,10 +135,10 @@ class gamma_simulator:
         if dict_shape_params is None:
             if self.dict_type == 'double_exponential':
                 # discrete-time parameters !!!
-                dict_shape_params = {'mean1': 2,  # tau1
-                                     'std1': 0.1,
-                                     'mean2': 10,  # tau2
-                                     'std2': 0.1}
+                dict_shape_params = {'mean2': 2,  # tau1
+                                     'std2': 0.1,
+                                     'mean1': 10,  # tau2
+                                     'std1': 0.1}
             elif self.dict_type == 'gamma':
                 dict_shape_params = {'mean1': 1.1,  # alpha
                                      'std1': 0.001,
@@ -420,17 +420,17 @@ class gamma_simulator:
             t_rise: rise time in seconds (always)
         """
         if self.dict_type == 'double_exponential':
-            assert self.dict_shape_params['mean2'] > self.dict_shape_params['mean1'], \
+            assert self.dict_shape_params['mean1'] > self.dict_shape_params['mean2'], \
                 "tau2 must be greater than tau1"
             if self.dict_shape_params['custom']:
                 # use the maximum value of the parameter
                 shape_time = 6 * self.dict_shape_params['param2bins'].max()
             else:
-                shape_time = 6 * (self.dict_shape_params['mean2'] + 3 * self.dict_shape_params['std2'])
+                shape_time = 6 * (self.dict_shape_params['mean1'] + 3 * self.dict_shape_params['std1'])
             # calculate the rise time
             tr = ((self.dict_shape_params["mean1"] * self.dict_shape_params["mean2"]) /
                   (self.dict_shape_params["mean1"] + self.dict_shape_params["mean2"]) *
-                  np.log(self.dict_shape_params["mean2"] / self.dict_shape_params["mean1"]))
+                  np.log(self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]))
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
@@ -474,7 +474,7 @@ class gamma_simulator:
         assert np.all(param1dict > 0), "First parameter of the shape must be positive - please check the parameters"
         assert np.all(param2dict > 0), "Second parameter of the shape must be positive - please check the parameters"
         if self.dict_type == 'double_exponential':
-            assert np.all(param2dict > param1dict), "tau2 must be greater than tau1"
+            assert np.all(param1dict > param2dict), "tau1 must be greater than tau2"
         return param1dict, param2dict
 
     def generate_random_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
@@ -581,7 +581,7 @@ class gamma_simulator:
         signal_norm = np.linalg.norm(signal)
         if self.n_events != 0:
             # measured SNR
-            self.measured_snr = 20 * (np.log10(np.linalg.norm(signal)/np.linalg.norm(noise)))
+            self.measured_snr = 20 * np.log10(np.linalg.norm(signal)/np.linalg.norm(noise))
         else:
             # no signal since there are no events
             self.measured_snr = -np.inf
@@ -596,7 +596,7 @@ class gamma_simulator:
         self.times = self.generate_arrival_times()
         self.n_events = len(self.times)
         if self.n_events == 0:
-            warnings.warn(f'Signal has {self.n_events} events and some parameters are not relevant. '
+            warnings.warn(f'Signal has {self.n_events} events. '
                           f'Longer signal and/or higher event rate are recommended.')
         self.lambda_measured = self.n_events / self.signal_len_sec  # actual event rate
         # energy: energy values for each event
