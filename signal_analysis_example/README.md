@@ -7,7 +7,7 @@ The signal is a raw HPGe measurement signal. The signal is 1 second long and has
 * Example of a saturated peak
 * Example of a detector's dead time.
 
-![Signal excerpt](signal_excerpt.png "Signal excerpt")
+![<img src="signal_excerpt.png" width="250"/>](signal_excerpt.png "Signal excerpt")
 
 ### Signal pre-processing
 The signal pre-processing in [signal_analysis.ipynb](signal_analysis.ipynb) includes the following steps.
@@ -40,7 +40,7 @@ The resulting signal is presented below.
 
 * The resulting distribution of the fitted $\alpha$ and $\beta$ parameters is stored for further simulation and is presented below.
 
-![$\alpha$ and $\beta$ histograms](alpha_beta_param.png "$\alpha$ and $\beta$ histograms")
+![parameter histograms](alpha_beta_param.png "$\alpha$ and $\beta$ histograms")
 
 * The resulting energy histogram for 512 is stored for further simulation and is presented below. 
 
