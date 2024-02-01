@@ -1,5 +1,5 @@
 ## Examples and tests
-* *Default parameters test in [defult_test](defult_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
+* *Default parameters test in [default_test](default_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
 **Zikang** please add all the numeric class parameter outputs to this code.
 ### Advanced functionality tests
 * Getting out the shapes dictionary by `re_regenerate_shape_dict()` in [regenerate_shapes_example.py](regenerate_shapes_example.py).
