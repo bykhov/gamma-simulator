@@ -3,3 +3,4 @@
 database/desktop.ini
 .idea/
 __pycache__/
+*.backup
