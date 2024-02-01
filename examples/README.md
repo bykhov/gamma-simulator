@@ -1,3 +1,4 @@
+<!--- Duplicated from the main readme.
 This is a specific introduction examples of the file，First let's look at the parameters we can change mainly:
 |Parameter name  |Parameter description|
 | --- | -----------|
@@ -12,11 +13,18 @@ This is a specific introduction examples of the file，First let's look at the p
 | noise_unit   | Unit of noise   |
 | noise   | The magnitude of noise in the given unit   |
 | dict_size   | Shape dictionary size due to jitter   |
-| seed   | The simulated random number seed   |
+| seed   | The simulated random number seed   | -->
+
+## Examples and tests
+* *Default parameters test in [defult_test](defult_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
+**Zikang** please add all the numeric class parameter outputs to this code.
+### Advanced functionality tests
+* Getting out the shapes dictionary by `re_regenerate_shape_dict()` in [regenerate_shapes_example.py](regenerate_shapes_example.py).
+* When the pulse count rate is very low, the warning is issued as show in [zero_event_warning.py](zero_event_warning.py). In this case, longer signal and/or higher event rate are recommended.
 
 # Defult_test
 
-Having the default parameter configuration in our program means that the program should work perfectly without any parameter input or any numeric class parameter input.
+
 
 In this section, I mainly tested the program's performance with no parameter input and given some literal parameters, and tested whether the program ran properly with the default parameters in the double exponential model and the gamma model
 
