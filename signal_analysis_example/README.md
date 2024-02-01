@@ -7,7 +7,7 @@ The signal is a raw HPGe measurement signal. The signal is 1 second long and has
 * Example of a saturated peak
 * Example of a detector's dead time.
 
-![<img src="signal_excerpt.png" width="250"/>](signal_excerpt.png "Signal excerpt")
+![<img src="signal_excerpt.png" width="150"/>](signal_excerpt.png "Signal excerpt")
 
 ### Signal pre-processing
 The signal pre-processing in [signal_analysis.ipynb](signal_analysis.ipynb) includes the following steps.
@@ -29,7 +29,7 @@ The saturation level corresponds to the highest value represented by `unit16` fo
 
 #### Summary
 The resulting signal is presented below.
-![Signal examples](signal_segments_examples.png "Signal segments examples")
+![<img src="signal_segments_examples.png" width="150"/>](signal_segments_examples.png "Signal segments examples")
 
 ### Fitting
 * All the segments were fitted with gamma shape MSE fit. The fitting examples are presented below. Note fitting takes a few minutes to run.
