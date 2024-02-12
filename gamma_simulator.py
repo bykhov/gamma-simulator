@@ -47,10 +47,9 @@ class gamma_simulator:
                 std2: standard deviation of the second parameter
            for custom parameters distribution, use the following format:
                 custom: True
-                param1bins: bins of the first parameter
-                param1weights: weights of the first parameter
-                param2bins: bins of the second parameter
-                param2weights: weights of the second parameter
+                param1val: values of the first parameter
+                param2val: values of the second parameter
+                use 'None' as a dict_size to remove warning about the dictionary size
         noise: noise level according to noise_unit
         noise_unit: 'std' for standard deviation of per sample noise,
                     'snr' for signal-to-noise ratio in dB
@@ -147,12 +146,18 @@ class gamma_simulator:
         # check if custom parameters are used explicitly
         dict_shape_params['custom'] = dict_shape_params.get('custom', False)
         if dict_shape_params['custom']:
-            self.dict_shape_params = self.shape_params_stats(dict_shape_params)
+            self.dict_shape_params = self.custom_shape_params_stats(dict_shape_params)
+            # update the dictionary size for custom parameters
+            # issue a warning if dict_size is not equal to the number of parameters
+            if self.dict_size is None and (len(self.dict_shape_params['param1val']) != self.dict_size):
+                warnings.warn(f'Dictionary size is automatically set to the number of shape parameters.')
+            self.dict_size = len(self.dict_shape_params['param1val'])
         else:
             self.dict_shape_params = dict_shape_params
         # non-random shape parameters
         if self.dict_shape_params['std1'] == self.dict_shape_params['std2'] == 0 and self.dict_size > 1:
             warnings.warn(f'Both std1 and std2 are zero, but dict_size is greater than 1.')
+
         # shape_len_sec: length of the shape in seconds
         # shape_len: length of the shape in samples
         # t_rise: rise time in seconds or samples
@@ -182,14 +187,17 @@ class gamma_simulator:
         self.noise_unit = noise_unit
         # calculate the duty cycle
         self.duty_cycle = self.lambda_value * self.shape_len_sec
+        if self.dict_shape_params['custom']:
+            self.param1dict, self.param2dict = self.dict_shape_params['param1val'], self.dict_shape_params['param2val']
+        else:
+            # parameters of the shape (per each dictionary entry)
+            self.param1dict, self.param2dict = self.generate_normal_dict_shape_parameters()
         # parameters of the signal (will be calculated later)
         self.lambda_measured = None
         self.energies = None
         self.n_events = None
         self.times = None
         self.measured_snr = None
-        self.param1dict = None  # shape parameters for each dictionary entry
-        self.param2dict = None  # shape parameters for each dictionary entry
         self.shape_param1 = None  # shape parameters for each event
         self.shape_param2 = None  # shape parameters for each event
 
@@ -200,7 +208,7 @@ class gamma_simulator:
         print(f'Loaded spectrum for {self.energy_desc} source')
         if len(self.weights) != 1:
             print(f'Weights are {self.weights}')
-        print(f'Energy spectrum between {self.hist_energy.min()} and {self.hist_energy.max()} keV '
+        print(f'Energy spectrum between {self.hist_energy.min():.1f} and {self.hist_energy.max():.1f} keV '
               f'with {self.hist_energy.shape[0]} bins')
         if self.enforce_edges:
             print(f'Shapes are NOT allowed to exceed the signal boundaries')
@@ -219,7 +227,7 @@ class gamma_simulator:
                 print('Normal shape distribution is used.')
             print(f'Shape parameters:  {self.dict_shape_params["mean1"]:1.3f}±{self.dict_shape_params["std1"]:1.3f}'
                   f' and {self.dict_shape_params["mean2"]:1.3f}±{self.dict_shape_params["std2"]:1.3f}')
-            print(f'Each shape has a maximum length of {self.shape_len_sec * self.fs:.3f} samples '
+            print(f'Each shape has a length of {self.shape_len_sec * self.fs:.3f} samples '
                   f'rounded to {self.shape_len} samples')
             print(f'Rise time is {self.t_rise:.3f} samples and fall time is {self.t_fall:.3f} samples')
         else:  # continuous time
@@ -246,7 +254,7 @@ class gamma_simulator:
                 print(f'Shape parameters: '
                       f'alpha = {self.dict_shape_params["mean1"]} ±{self.dict_shape_params["std1"]:1.3e}'
                       f' and beta = {self.dict_shape_params["mean2"]} ±{self.dict_shape_params["std2"]:1.3e}')
-            print(f'Each shape has a maximum length of {self.shape_len_sec:1.3e} sec that are {self.shape_len} samples')
+            print(f'Each shape has a length of {self.shape_len_sec:1.3e} sec that are {self.shape_len} samples')
             print(f'Rise time is {self.t_rise:.3e} sec and fall time is {self.t_fall:.3e} sec')
         # duty cycle and pile-up probability
         print(f'Duty cycle is given by {self.duty_cycle:.2f}'
@@ -265,7 +273,7 @@ class gamma_simulator:
         if self.seed is None:
             print('Random seed is not defined')
         else:
-            print(f'Pre-defined random seed is used: {self.seed}')
+            print(f'Pre-defined random seed {self.seed} is used')
 
     def pile_up_stat(self):
         """evaluate number of the pile-ups in the generated signal"""
@@ -384,36 +392,27 @@ class gamma_simulator:
 
     # --- Shapes -------------------------------------------------------------
     @staticmethod
-    def shape_params_stats(dict_shape_params: dict) -> dict:
+    def custom_shape_params_stats(dict_shape_params: dict) -> dict:
         """Evaluate the parameters of the shape from the custom distribution.
         dict_shape_params: dictionary of shape parameters
-        return: dictionary of shape parameters mean1, std1, mean2, std2
+            param1val: values of the first parameter
+            param2val: values of the second parameter
+        return:
+            dictionary of shape parameters mean1, std1, mean2, std2
+            param1val and param2val are converted to numpy arrays
         """
-        # fetch the parameters from the dictionary and normalize the weights
-        param1bins = np.array(dict_shape_params['param1bins'])
-        # How to call a static method from another static method?
-        # https://stackoverflow.com/questions/1859959/static-methods-how-to-call-a-method-from-another-method
-        param1weights = __class__.normalize_histogram(np.array(dict_shape_params['param1weights']))
-        param2bins = np.array(dict_shape_params['param2bins'])
-        param2weights = __class__.normalize_histogram(np.array(dict_shape_params['param2weights']))
-        # calculate the mean and std of the parameters
-        dict_shape_params['mean1'] = np.sum(param1bins * param1weights)
-        dict_shape_params['mean2'] = np.sum(param2bins * param2weights)
-        dict_shape_params['std1'] = np.sqrt(np.sum(
-            param1weights * (param1bins - dict_shape_params['mean1']) ** 2
-        ))
-        dict_shape_params['std2'] = np.sqrt(np.sum(
-            param2weights * (param2bins - dict_shape_params['mean2']) ** 2
-        ))
-        # save the parameters as numpy arrays and with normalized weights
-        dict_shape_params['param1bins'] = param1bins
-        dict_shape_params['param2bins'] = param2bins
-        dict_shape_params['param1weights'] = param1weights
-        dict_shape_params['param2weights'] = param2weights
+        if len(dict_shape_params['param1val']) != len(dict_shape_params['param2val']):
+            raise ValueError('Number of parameters for the first and second parameter must be the same')
+        dict_shape_params['mean1'] = np.mean(dict_shape_params['param1val'])
+        dict_shape_params['mean2'] = np.mean(dict_shape_params['param2val'])
+        dict_shape_params['std1'] = np.std(dict_shape_params['param1val'])
+        dict_shape_params['std2'] = np.std(dict_shape_params['param2val'])
+        dict_shape_params['param1val'] = np.array(dict_shape_params['param1val'])
+        dict_shape_params['param2val'] = np.array(dict_shape_params['param2val'])
         return dict_shape_params
 
     def evaluate_shape_len(self) -> tuple[int, float, float]:
-        """Evaluate the maximum length of the shape for the simulation
+        """Evaluate the average length of the shape for the simulation
         return:
             shape_len: length of the shape in samples
             shape_time: length of the shape in seconds
@@ -422,11 +421,7 @@ class gamma_simulator:
         if self.dict_type == 'double_exponential':
             assert self.dict_shape_params['mean1'] > self.dict_shape_params['mean2'], \
                 "tau2 must be greater than tau1"
-            if self.dict_shape_params['custom']:
-                # use the maximum value of the parameter
-                shape_time = 6 * self.dict_shape_params['param2bins'].max()
-            else:
-                shape_time = 6 * (self.dict_shape_params['mean1'] + 3 * self.dict_shape_params['std1'])
+            shape_time = 6 * (self.dict_shape_params['mean1'] + 3 * self.dict_shape_params['std1'])
             # calculate the rise time
             tr = ((self.dict_shape_params["mean1"] * self.dict_shape_params["mean2"]) /
                   (self.dict_shape_params["mean1"] + self.dict_shape_params["mean2"]) *
@@ -434,13 +429,8 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            if self.dict_shape_params['custom']:
-                # use the maximum value of for the shape_time
-                shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['param1bins'].max() - 1,
-                                             scale=1 / self.dict_shape_params['param2bins'].min())
-            else:
-                shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'] - 1,
-                                             scale=1 / self.dict_shape_params['mean2'])
+            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'] - 1,
+                                         scale=1 / self.dict_shape_params['mean2'])
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
         else:
@@ -448,29 +438,19 @@ class gamma_simulator:
         shape_len = int(shape_time * self.fs)
         return shape_len, shape_time, tr
 
-    def generate_dict_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
+    def generate_normal_dict_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
         """Generate random parameters for the double exponential shape.
         return: tuple of param1 and param2 are shape parameters for each dictionary entry
         """
         np.random.seed(self.seed)
         # generate parameters
-        if self.dict_shape_params['custom']:
-            param1dict = np.random.choice(self.dict_shape_params['param1bins'],
-                                          size=self.dict_size,
-                                          replace=True,
-                                          p=self.dict_shape_params['param1weights'])
-            param2dict = np.random.choice(self.dict_shape_params['param2bins'],
-                                          size=self.dict_size,
-                                          replace=True,
-                                          p=self.dict_shape_params['param2weights'])
-        else:
-            # param1values and param2values are parameters for each shape in the dictionary
-            param1dict = np.random.normal(self.dict_shape_params['mean1'],
-                                          self.dict_shape_params['std1'],
-                                          self.dict_size)
-            param2dict = np.random.normal(self.dict_shape_params['mean2'],
-                                          self.dict_shape_params['std2'],
-                                          self.dict_size)
+        # param1values and param2values are parameters for each shape in the dictionary
+        param1dict = np.random.normal(self.dict_shape_params['mean1'],
+                                      self.dict_shape_params['std1'],
+                                      self.dict_size)
+        param2dict = np.random.normal(self.dict_shape_params['mean2'],
+                                      self.dict_shape_params['std2'],
+                                      self.dict_size)
         assert np.all(param1dict > 0), "First parameter of the shape must be positive - please check the parameters"
         assert np.all(param2dict > 0), "Second parameter of the shape must be positive - please check the parameters"
         if self.dict_type == 'double_exponential':
@@ -479,15 +459,20 @@ class gamma_simulator:
 
     def generate_random_shape_parameters(self) -> tuple[np.ndarray, np.ndarray]:
         """Generate random parameters for the shape.
-        return: tuple of param1 and param2 are shape parameters for each dictionary entry
+        return: tuple of shape_param1 and shape_param2 are shape parameters for each event
         """
-        # parameters of the shape (per each dictionary entry)
-        self.param1dict, self.param2dict = self.generate_dict_shape_parameters()
-        # assign the parameters to events
-        # sample from the dictionary for each event
-        # reshape to column vector for broadcasting
-        self.shape_param1 = np.random.choice(self.param1dict, size=self.n_events, replace=True).reshape(-1, 1)
-        self.shape_param2 = np.random.choice(self.param2dict, size=self.n_events, replace=True).reshape(-1, 1)
+        np.random.seed(self.seed)
+        if self.dict_shape_params['custom']:
+            x = self.dict_shape_params['param1val']
+            y = self.dict_shape_params['param2val']
+            idx = np.random.randint(0, len(x), size=self.n_events)
+            self.shape_param1, self.shape_param2 = x[idx].reshape(-1, 1), y[idx].reshape(-1, 1)
+        else:
+            # assign the parameters to events
+            # sample from the dictionary for each event
+            # reshape to column vector for broadcasting
+            self.shape_param1 = np.random.choice(self.param1dict, size=self.n_events, replace=True).reshape(-1, 1)
+            self.shape_param2 = np.random.choice(self.param2dict, size=self.n_events, replace=True).reshape(-1, 1)
 
     @property
     def generate_all_dict_shapes(self) -> np.ndarray:
@@ -581,7 +566,7 @@ class gamma_simulator:
         signal_norm = np.linalg.norm(signal)
         if self.n_events != 0:
             # measured SNR
-            self.measured_snr = 20 * np.log10(np.linalg.norm(signal)/np.linalg.norm(noise))
+            self.measured_snr = 20 * np.log10(np.linalg.norm(signal) / np.linalg.norm(noise))
         else:
             # no signal since there are no events
             self.measured_snr = -np.inf
@@ -631,22 +616,22 @@ if __name__ == '__main__':
     # s = simulator.generate_signal()
     # simulator.verbose_info()
     # # # %%
-    # simulator = gamma_simulator(verbose=True,
-    #                             verbose_plots={'signal': True},
-    #                             source={'name': ['Co-60', 'I-125'], 'weights': [1, 2]},
-    #                             signal_len=1,  # "analog" signal of 1 second that are 1e7 samples
-    #                             fs=10e6,
-    #                             lambda_value=1e4,
-    #                             dict_type='double_exponential',
-    #                             dict_shape_params={'mean1': 1e-7,  # continuous-time parameters measured in seconds
-    #                                                'std1': 1e-9,
-    #                                                'mean2': 1e-5,
-    #                                                'std2': 1e-7},
-    #                             noise_unit='std',
-    #                             noise=1e-3,
-    #                             dict_size=10,
-    #                             seed=42)
-    # s = simulator.generate_signal()
+    simulator = gamma_simulator(verbose=True,
+                                verbose_plots={'signal': True, 'shapes': True},
+                                source={'name': ['Co-60', 'I-125'], 'weights': [1, 2]},
+                                signal_len=1,  # "analog" signal of 1 second that are 1e7 samples
+                                fs=10e6,
+                                lambda_value=1e4,
+                                dict_type='double_exponential',
+                                dict_shape_params={'mean1': 1e-5,  # continuous-time parameters measured in seconds
+                                                   'std1': 1e-7,
+                                                   'mean2': 1e-7,
+                                                   'std2': 1e-9},
+                                noise_unit='std',
+                                noise=1e-3,
+                                dict_size=10,
+                                seed=42)
+    s = simulator.generate_signal()
     #
     # # %%
     # simulator = gamma_simulator(verbose=True,
@@ -661,37 +646,19 @@ if __name__ == '__main__':
     #                             seed=42)
     # s = simulator.generate_signal()
 
-    # #%%
-    #     simulator = gamma_simulator(verbose=True,
-    #                                 verbose_plots={'shapes': True, 'signal': True},
-    #                                 source={'name': 'Co-60', 'weights': 1},
-    #                                 lambda_value=0.1,
-    #                                 dict_type='double_exponential',
-    #                                 dict_shape_params={'custom': True,
-    #                                                    'param1bins': [1, 2, 3],
-    #                                                    'param1weights': [0.1, 0.2, 0.7],
-    #                                                    'param2bins': [4, 5],
-    #                                                    'param2weights': [0.1, 0.2]},
-    #                                 noise=1e-3,
-    #                                 dict_size=10,
-    #                                 enforce_edges=False,
-    #                                 seed=42)
-    #     s = simulator.generate_signal()
     # %%
     simulator = gamma_simulator(verbose=True,
                                 verbose_plots={'shapes': True, 'signal': True},
                                 source={'name': 'Co-60', 'weights': 1},
-                                lambda_value=0.001,
+                                lambda_value=0.1,
                                 dict_type='gamma',
                                 dict_shape_params={'custom': True,
-                                                   'param1bins': [2, 3],
-                                                   'param1weights': [0.1, 0.2],
-                                                   'param2bins': [0.4, 0.85],
-                                                   'param2weights': [0.1, 0.2]},
+                                                   'param1val': [2, 3, 4],
+                                                   'param2val': [0.4, 0.5, 0.66]},
                                 noise=1e-3,
-                                dict_size=6,
+                                dict_size=None,
                                 enforce_edges=False,
                                 seed=44)
     s = simulator.generate_signal()
 
-
+#%%
