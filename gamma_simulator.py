@@ -429,7 +429,7 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'] - 1,
+            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'] ,
                                          scale=1 / self.dict_shape_params['mean2'])
             # calculate the rise time
             tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
@@ -489,7 +489,7 @@ class gamma_simulator:
             s[:, 0] = 0  # set the first sample to zero
         elif self.dict_type == 'gamma':
             # n[:, 0] = 0
-            s = stats.gamma.pdf(n * self.dt, self.shape_param1 - 1, scale=1 / self.shape_param2)
+            s = stats.gamma.pdf(n * self.dt, self.shape_param1 , scale=1 / self.shape_param2)
             # If the built-in function is used, the parameter is subtracted by one,
             # s = ((n * self.dt) ** self.shape_param1) * np.exp(-self.shape_param2 * n * self.dt)
         # normalize the shape
@@ -510,7 +510,7 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             # n[:, 0] = 0
             shape_dict = stats.gamma.pdf(n * self.dt,
-                                         self.param1dict.reshape(-1, 1) - 1,
+                                         self.param1dict.reshape(-1, 1) ,
                                          scale=1 / self.param2dict.reshape(-1, 1))
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
