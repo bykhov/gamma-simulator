@@ -139,7 +139,7 @@ class gamma_simulator:
                                      'mean1': 10,  # tau2
                                      'std1': 0.1}
             elif self.dict_type == 'gamma':
-                dict_shape_params = {'mean1': 1.1,  # alpha
+                dict_shape_params = {'mean1': 0.1,  # alpha
                                      'std1': 0.001,
                                      'mean2': 0.1,  # beta
                                      'std2': 0.001}
@@ -429,10 +429,10 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
                 "alpha and beta must be positive"
-            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1'] - 1,
+            shape_time = stats.gamma.ppf(0.995, self.dict_shape_params['mean1']+1,
                                          scale=1 / self.dict_shape_params['mean2'])
             # calculate the rise time
-            tr = self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]
+            tr = (self.dict_shape_params["mean1"]) / self.dict_shape_params["mean2"]
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         shape_len = int(shape_time * self.fs)
@@ -489,8 +489,8 @@ class gamma_simulator:
             s[:, 0] = 0  # set the first sample to zero
         elif self.dict_type == 'gamma':
             # n[:, 0] = 0
-            s = stats.gamma.pdf(n * self.dt, self.shape_param1 - 1, scale=1 / self.shape_param2)
-            # If the built-in function is used, the parameter is subtracted by one,
+            s = stats.gamma.pdf(n * self.dt, self.shape_param1 +1, scale=1 / self.shape_param2)
+            s[:, 0] = 0
             # s = ((n * self.dt) ** self.shape_param1) * np.exp(-self.shape_param2 * n * self.dt)
         # normalize the shape
         s /= s.sum(axis=1, keepdims=True)
@@ -510,8 +510,9 @@ class gamma_simulator:
         elif self.dict_type == 'gamma':
             # n[:, 0] = 0
             shape_dict = stats.gamma.pdf(n * self.dt,
-                                         self.param1dict.reshape(-1, 1) - 1,
+                                         self.param1dict.reshape(-1, 1) + 1,
                                          scale=1 / self.param2dict.reshape(-1, 1))
+            shape_dict[:, 0] = 0
         else:
             raise ValueError(f'Unknown shape type: {self.dict_type}')
         return shape_dict
@@ -631,6 +632,28 @@ if __name__ == '__main__':
                                 noise=1e-3,
                                 dict_size=10,
                                 seed=42)
+    s = simulator.generate_signal()
+
+
+    simulator = gamma_simulator(verbose=True,
+        verbose_plots = {'shapes': True, 'signal': True},
+        source={'name': 'Co-60', 'weights': 1},
+        signal_len=3,# "analog" signal of 1 second that are 1e7 samples
+        fs = 1e6,
+        lambda_value = 1e4,
+        dict_type = 'gamma',
+        # dict_shape_params={'mean1': 1e-5,  # continuous-time parameters measured in seconds
+        #                    'std1': 1e-7,
+        #                    'mean2': 1e-7,
+        #                    'std2': 1e-9},
+        dict_shape_params = {'mean1': 0.1,
+            'std1': 0.001,
+            'mean2': 1e5,
+            'std2': 1e3},
+        noise_unit = 'std',
+        noise = 1e-1,
+        dict_size = 20,
+        seed = 44)
     s = simulator.generate_signal()
     #
     # # %%

@@ -5,28 +5,25 @@
 * Getting out the shapes dictionary by `re_regenerate_shape_dict()` in [regenerate_shapes_example.py](regenerate_shapes_example.py).
 * When the pulse count rate is very low, the warning is issued as show in [zero_event_warning.py](zero_event_warning.py). In this case, longer signal and/or higher event rate are recommended.
 
-# Defult_test
+## [Default_test](default_test.ipynb)
 
+* In this section, performance tests were conducted on the program with no parameter input as well as with some predefined literal parameters. The aim was to ensure the proper functioning of the program under default parameters in both the double exponential model and the gamma model.
 
+## [Pulse_shape](Pulse_shape.ipynb)
 
-In this section, I mainly tested the program's performance with no parameter input and given some literal parameters, and tested whether the program ran properly with the default parameters in the double exponential model and the gamma model
+* The simulator has implemented two shape models. In this test, two shapes were randomly selected, while the remaining numerical parameters were also randomly changed to verify the correct execution of the program under different shape parameters
+## [fs](fs.ipynb)
 
-# Pulse_shape
+* The variable **fs** represents the sampling rate. In this test, frequencies, including the standard frequency of 10e6, were examined to ensure the proper functioning of the simulator
 
-Our simulator implemented two shape models. In this test, I randomly selected the two shapes, while the rest of the numerical parameters were randomly changed to test that the program could run correctly under different shape parameters
+## [noise](noise.ipynb)
 
-# fs
+* Incorporated noise is a characteristic of each signal and can be introduced in various manners. During this test, we examined the inclusion of both normal distribution noise and fixed Signal-to-Noise Ratio (SNR) noise. This design ensures the versatility of our program, making it well-suited for users with diverse preferences
 
-fs represents the sampling rate. In this test, we tested the frequency including the common frequency 10e6 to ensure that the simulator can work normally
+## [signal_length](signal_length.ipynb)
 
-# noise
+* In this test, evaluations were performed with tests of different lengths. Excessive test length revealed potential issues related to insufficient memory space. Hence, it is recommended to limit the simulation duration to 1000 seconds at a frequency of 10e6.
+* 
+## [source](source.ipynb)
 
-Each signal contains noise, and noise can be added in different ways. In this test, we tested the addition of both normal distribution noise and fixed SNR noise, so that our program can be more suitable for users with different habits
-
-# signal_length
-
-In this test, I gave tests of different lengths. When the length is too large, the problem of insufficient memory space will occur. It is recommended that the simulation should not exceed 1000 seconds at the frequency of 10e6.
-
-# source
-
-In this test I mainly tested pure substances and mixtures to ensure that our simulator was able to simulate the pulse of mixtures
+* In this test, the focus was on assessing pure substances and mixtures to ensure the simulator's capability in simulating pulse signals of mixtures.
