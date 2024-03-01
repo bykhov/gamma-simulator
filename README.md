@@ -66,13 +66,15 @@ Make sure you have the following libraries in your environment
 * scipy
 * matplotlib
 * urllib  
-You can use the following command to install the libaries
+(It doesn't matter that you don't have these, because these dependencies will be installed when you install the gamma-simulator package)
+
+Please use the following command to install our program
 ```bash
-pip install numpy scipy matplotlib urllib
+pip install gamma-simulator
 ```
 ### Import
 ```python
-from gamma_simulator import gamma_simulator
+from gamma_simulator.gamma_simulator import gamma_simulator
 ```
 
 ### Run
@@ -89,7 +91,7 @@ simulator = gamma_simulator(verbose=True,
                             fs=10e5,
                             lambda_value=1e4,
                             dict_type='gamma',
-                            dict_shape_params={'mean1':  1.1,
+                            dict_shape_params={'mean1':  0.1,
                                                'std1': 0.001,
                                                'mean2': 1e5,
                                                'std2': 1e3},
@@ -109,7 +111,7 @@ signal = simulator.generate_signal()
 If you are not familiar with shape parameters, use the following combination of parameters
 ```python
 {dict_type='gamma',
-dict_shape_params={'mean1':  1.1,
+dict_shape_params={'mean1':  0.1,
 'std1': 0.001,
 'mean2': 1e5,
 'std2': 1e3}
@@ -117,10 +119,10 @@ dict_shape_params={'mean1':  1.1,
 or
 ```python
 {dict_type='double_exponential',
-dict_shape_params={'mean1': 1e-7, 
-'std1': 1e-9,
-'mean2': 1e-5,
-'std2': 1e-7}
+dict_shape_params={'mean1': 1e-5, 
+'std1': 1e-7,
+'mean2': 1e-7,
+'std2': 1e-9}
 ```
 ### Plot setting
 Our simulator supports drawing a variety of graphs, including energy, shape, signal and spectrum.
@@ -136,7 +138,7 @@ verbose_plots={'energy':True, 'shapes': True, 'signal': True}
 ## Examples
 
 ```python
-from gamma_simulator import gamma_simulator
+from gamma_simulator.gamma_simulator import gamma_simulator
 simulator = gamma_simulator(verbose=True,
                             verbose_plots={'shapes': True, 'signal': True},
                             source={'name': 'Co-60', 'weights': 1},
@@ -144,10 +146,10 @@ simulator = gamma_simulator(verbose=True,
                             fs=10e6,
                             lambda_value=1e4,
                             dict_type='double_exponential',
-                            dict_shape_params={'mean1': 1e-7,  # continuous-time parameters measured in seconds
-                                               'std1': 1e-9,
-                                               'mean2': 1e-5,
-                                               'std2': 1e-7},
+                            dict_shape_params={'mean1': 1e-5,  # continuous-time parameters measured in seconds
+                                               'std1': 1e-7,
+                                               'mean2': 1e-7,
+                                               'std2': 1e-9},
                             noise_unit='std',
                             noise=1e-3,
                             dict_size=10,
@@ -158,7 +160,7 @@ signal = simulator.generate_signal()
 ![result1](./fig/Result_for_example1.png)
 
 ```python
-from gamma_simulator import gamma_simulator
+from gamma_simulator.gamma_simulator import gamma_simulator
 simulator = gamma_simulator(verbose=True,
                             verbose_plots={'energy': True, 'signal': True},
                             source={'name': ['Co-60', 'I-125'], 'weights': [1, 2]},
@@ -166,7 +168,7 @@ simulator = gamma_simulator(verbose=True,
                             fs=10e6,
                             lambda_value=1e4,
                             dict_type='gamma',
-                            dict_shape_params={'mean1':  1.1,  # continuous-time parameters measured in seconds
+                            dict_shape_params={'mean1':  0.1,  # continuous-time parameters measured in seconds
                                                'std1': 0.001,
                                                'mean2': 1e5,
                                                'std2': 1e3},
