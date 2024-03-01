@@ -109,7 +109,7 @@ signal = simulator.generate_signal()
 If you are not familiar with shape parameters, use the following combination of parameters
 ```python
 {dict_type='gamma',
-dict_shape_params={'mean1':  1.1,
+dict_shape_params={'mean1':  0.1,
 'std1': 0.001,
 'mean2': 1e5,
 'std2': 1e3}
