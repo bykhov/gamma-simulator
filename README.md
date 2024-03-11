@@ -17,6 +17,48 @@ The original intention of the gamma simulator was to introduce deep learning int
 ![mainflow](./fig/mainflow.png)
 ### Implementation structure
  ![Flow_software](./fig/Flow_software.png)
+### Parameter description
+Setting Parameters(input by users):
+|Parameter name  |Parameter description|
+| --- | -----------|
+| verbose   | Whether to output detailed information   |
+| verbose_plots   | Whether images need to be output   |
+| source   | The simulated radioactive source   |
+| signal_len   | Length of time to simulate sampling(s)   |
+| fs   | Analog sampling rate   |
+| lambda_value   | Analog pulse count rate(cps)   |
+| dict_type    | Shape type model of the simulated pulse   |
+| dict_shape_params   | dict shape params   |
+| noise_unit   | Unit of noise   |
+| noise   | The magnitude of noise in the given unit   |
+| dict_size   | Shape dictionary size due to jitter   |
+| seed   | The simulated random number seed   |
+
+Shape parameters:
+|Parameter name  |Parameter description|
+| --- | -----------|
+| t_rise   | rise time of the shape   |
+| t_fall   | fall time of the shape   |
+| shape_len   | length of the shape in samples   |
+| shape_len_sec   | length of the shape in seconds   |
+
+Events parameters:
+|Parameter name  |Parameter description|
+| --- | -----------|
+| n_events   | number of events in the signal   |
+| times   | arrival times of the events   |
+| energies   | energy values for each event   |
+| lambda_measured   | actual event rate   |
+| shape_param1, shape_param2   | shape parameters for each event   |
+
+Signal parameters:
+|Parameter name  |Parameter description|
+| --- | -----------|
+| signal_len   | length of the signal in samples   |
+| signal_len_sec   | length of the signal in seconds   |
+| duty_cycle   | duty cycle of the signal  |
+| pile_up_stat   | number of the pile-ups in the generated signal   |
+| measured_snr   | measured SNR of the generated signal (dB)   |
 
 ## Use
 ### Install
