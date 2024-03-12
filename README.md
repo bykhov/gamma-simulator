@@ -19,7 +19,7 @@ The original intention of the gamma simulator was to introduce deep learning int
  ![Flow_software](./fig/Flow_software.png)
 ### Parameter description
 ### Parameter description
-|**Setting Parameters(input by users):**| 
+|**Setting Parameters(input by users):**| |
 | --- | -----------|
 | verbose   | Whether to output detailed information   |
 | verbose_plots   | Whether images need to be output   |
@@ -33,18 +33,18 @@ The original intention of the gamma simulator was to introduce deep learning int
 | noise   | The magnitude of noise in the given unit   |
 | dict_size   | Shape dictionary size due to jitter   |
 | seed   | The simulated random number seed   |
-|**Shape parameters:**| 
+|**Shape parameters:**| |
 | t_rise   | rise time of the shape   |
 | t_fall   | fall time of the shape   |
 | shape_len   | length of the shape in samples   |
 | shape_len_sec   | length of the shape in seconds   |
-|**Events parameters:**| 
+|**Events parameters:**| |
 | n_events   | number of events in the signal   |
 | times   | arrival times of the events   |
 | energies   | energy values for each event   |
 | lambda_measured   | actual event rate   |
 | shape_param1, shape_param2   | shape parameters for each event   |
-|**Signal parameters:**| 
+|**Signal parameters:**| |
 | signal_len   | length of the signal in samples   |
 | signal_len_sec   | length of the signal in seconds   |
 | duty_cycle   | duty cycle of the signal  |
