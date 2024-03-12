@@ -61,6 +61,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 | *generate_signal_without_noise*   |times, energies,shapes_len, shapes | *signal without noise*| The independent pulses and shapes that we have generated are pieced together to form an analog noiseless signal|
 | *generate_signal_with_noise*  |*signal without noise*, noise_unit, noise|signal|The noiseless signal is superimposed on the specified unit and size of noise to obtain a real analog signal|
 
+**A large number of parameters mentioned above are used in the function introduction. In our real code, there is a high degree of integration and a large number of function reuse. Some inputs are not directly called in this function, but by calling other functions, and some output intermediate outputs are directly called by another function after the result is generated, so these temporary variables are not reflected in the description. So this function introduction is not particularly strict, but it is definitely the most suitable for readers to clarify the code logic of the introduction**
 
 ## Use
 ### Install
