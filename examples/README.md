@@ -18,7 +18,7 @@ This file is to test the function and robustness of the code, we can first revie
  We will test and adjust the code according to these settings, so as to prove that our code is stable and effective
 * *Default parameters test in [default_test](default_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
 
-# Basic function testTest
+# Basic function tests
 
 ## [source](source.ipynb)
 
