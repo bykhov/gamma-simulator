@@ -18,8 +18,8 @@ The original intention of the gamma simulator was to introduce deep learning int
 ### Implementation structure
  ![Flow_software](./fig/Flow_software.png)
 ### Parameter description
-Setting Parameters(input by users):
-|Parameter name  |Parameter description|
+
+|Setting Parameters(input by users):|
 | --- | -----------|
 | verbose   | Whether to output detailed information   |
 | verbose_plots   | Whether images need to be output   |
@@ -33,17 +33,14 @@ Setting Parameters(input by users):
 | noise   | The magnitude of noise in the given unit   |
 | dict_size   | Shape dictionary size due to jitter   |
 | seed   | The simulated random number seed   |
-
-Shape parameters:
-|Parameter name  |Parameter description|
+|Shape parameters:|
 | --- | -----------|
 | t_rise   | rise time of the shape   |
 | t_fall   | fall time of the shape   |
 | shape_len   | length of the shape in samples   |
 | shape_len_sec   | length of the shape in seconds   |
 
-Events parameters:
-|Parameter name  |Parameter description|
+|Events parameters:|
 | --- | -----------|
 | n_events   | number of events in the signal   |
 | times   | arrival times of the events   |
@@ -51,8 +48,7 @@ Events parameters:
 | lambda_measured   | actual event rate   |
 | shape_param1, shape_param2   | shape parameters for each event   |
 
-Signal parameters:
-|Parameter name  |Parameter description|
+|Signal parameters:|
 | --- | -----------|
 | signal_len   | length of the signal in samples   |
 | signal_len_sec   | length of the signal in seconds   |
