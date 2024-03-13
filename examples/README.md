@@ -1,19 +1,20 @@
 # Goal
 This file is to test the function and robustness of the code, we can first review the settings parameter that users can adjust.
-|**Setting Parameters:**|| 
-| --- | -----------|
-| verbose   | Whether to output detailed information   |
-| verbose_plots   | Whether images need to be output   |
-| source   | The simulated radioactive source   |
-| signal_len   | Length of time to simulate sampling(s)   |
-| fs   | Analog sampling rate   |
-| lambda_value   | Analog pulse count rate(cps)   |
-| dict_type    | Shape type model of the simulated pulse   |
-| dict_shape_params   | dict shape params   |
-| noise_unit   | Unit of noise   |
-| noise   | The magnitude of noise in the given unit   |
-| dict_size   | Shape dictionary size due to jitter   |
-| seed   | The simulated random number seed   |
+ 
+|**Setting Parameters:**||type|Default value|
+| --- | -----------|-----------|-----------|
+| verbose   | Whether to output detailed information   |bool|False |
+| verbose_plots   | Whether images need to be output   |dict|None|
+| source   | The simulated radioactive source   |str or dict |'Co-60' |
+| signal_len   | Length of time to simulate sampling(s)   |int or float|1024|
+| fs   | Analog sampling rate   |float |1 |
+| lambda_value   | Analog pulse count rate(cps)   |float|0.1|
+| dict_type    | Shape type model of the simulated pulse   |str|'gamma'|
+| dict_shape_params   | dict shape params   |dict|Please see [Notice](#notice)|
+| noise_unit   | Unit of noise   |str|'std'|
+| noise   | The magnitude of noise in the given unit   |float|0.01|
+| dict_size   | Shape dictionary size due to jitter   | int|100 |
+| seed   | The simulated random number seed   |int|None|
 
  We will test and adjust the code according to these settings, so as to prove that our code is stable and effective
 * *Default parameters test in [default_test](default_test.ipynb):* Having the default parameter configuration in our program means that the program should work perfectly without any parameter input. 
