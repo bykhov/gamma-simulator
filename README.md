@@ -35,26 +35,29 @@ The original intention of the gamma simulator was to introduce deep learning int
 
 **The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
 
-|**Shape parameters:**| |
-| --- | -----------|
-| t_rise   | rise time of the shape   |
-| t_fall   | fall time of the shape   |
-| shape_len   | length of the shape in samples   |
-| shape_len_sec   | length of the shape in seconds   |
-|**Events parameters:**| |
-|hist_energy|The energy contained in the spectrum (the transverse axis of the desired spectrum)|
-|hist_counts|The probability of generating energy corresponding to the simulated source(vertical axis of the desired energy spectrum)|
-| n_events   | number of events in the signal   |
-| times   | arrival times of the events   |
-| energies   | The energy sequence of the pulses produced in this simulation   |
-| lambda_measured   | actual event rate   |
-| shape_param1, shape_param2   | shape parameters for each event   |
+|**Shape parameters:**|Parameter meaning|type | eg |
+| --- | -----------|-----------|-----------|
+| t_rise   | rise time of the shape   | float |4.560e-07 |
+| t_fall   | fall time of the shape   | float |6.134e-05  |
+| shape_len   | length of the shape in samples   | int | 61|
+| shape_len_sec   | length of the shape in seconds   | float | 6.180e-05|
+|**Events parameters:**| | | |
+|hist_energy|The energy contained in the spectrum (the transverse axis of the desired spectrum)| array |[0.02,0.04,0.06,... ,1667.20] |
+|hist_counts|The probability of generating energy corresponding to the simulated source(vertical axis of the desired energy spectrum)|array|[0.0002,0.001,0.0015,... ,0.0001]|
+| n_events   | number of events in the signal   | int | 16054|
+| times   | arrival times of the events   |array |[0.7e-05,1.8e-05,... ,0.92] |
+| energies   | The energy sequence of the pulses produced in this simulation|array|[223.2,453.6,889.4,... ,635.4]|
+| lambda_measured   | actual event rate   | float | 13672.2 |
+| shape_param1, shape_param2   | shape parameters for each event   | array |two sequences of n_event values conforming to the Gaussian distribution of the given parameter|
 |**Signal parameters:**| |
-| signal_len   | length of the signal in samples   |
-| signal_len_sec   | length of the signal in seconds   |
-| duty_cycle   | duty cycle of the signal  |
-| pile_up_stat   | number of the pile-ups in the generated signal   |
-| measured_snr   | measured SNR of the generated signal (dB)   |
+| signal_len   | The number of samples at a given frequency in the simulated time  | int or float| 1e6 |
+| signal_len_sec   | The length of time of the analog signal(s)   | int or float| 1 |
+| duty_cycle   | The proportion of the time to detect the signal to the total analog time  |float | 0.67 |
+| pile_up_stat   | number of the pile-ups in the generated signal   | int | 4302 |
+| measured_snr   | measured SNR of the generated signal (dB)   |float| 66.26 |
+
+**These values are intermediate values generated during the simulation, so there are no default values. Here are some examples of these values to give the reader an idea of what these values are**
+
 ### Main function
 |**Function name**|**input**|**output**|**Function action**|
 | --- | ---|-----------|-----------|
