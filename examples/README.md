@@ -10,7 +10,7 @@ This file is to test the function and robustness of the code, we can first revie
 | fs   | Analog sampling rate   |float |1 |
 | lambda_value   | Analog pulse count rate(cps)   |float|0.1|
 | dict_type    | Shape type model of the simulated pulse   |str|'gamma'|
-| dict_shape_params   | dict shape params   |dict|Please see [Notice](/gamma-simulator/README.md#notice)|
+| dict_shape_params   | dict shape params   |dict|Please see [Notice](/main/README.md#notice)|
 | noise_unit   | Unit of noise   |str|'std'|
 | noise   | The magnitude of noise in the given unit   |float|0.01|
 | dict_size   | Shape dictionary size due to jitter   | int|100 |
