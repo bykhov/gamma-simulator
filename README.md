@@ -18,21 +18,25 @@ The original intention of the gamma simulator was to introduce deep learning int
 ### Implementation structure
  ![Flow_software](./fig/Flow_software.png)
 ### Parameter description
-|**Setting Parameters(input by users):**| |
-| --- | -----------|
-| verbose   | Whether to output detailed information   |
-| verbose_plots   | Whether images need to be output   |
-| source   | The simulated radioactive source   |
-| signal_len   | Length of time to simulate sampling(s)   |
-| fs   | Analog sampling rate   |
-| lambda_value   | Analog pulse count rate(cps)   |
-| dict_type    | Shape type model of the simulated pulse   |
-| dict_shape_params   | dict shape params   |
-| noise_unit   | Unit of noise   |
-| noise   | The magnitude of noise in the given unit   |
-| dict_size   | Shape dictionary size due to jitter   |
-| seed   | The simulated random number seed   |
+|**Setting Parameters:**||type|Default value|
+| --- | -----------|-----------|-----------|
+| verbose   | Whether to output detailed information   |bool|False |
+| verbose_plots   | Whether images need to be output   |dict|None|
+| source   | The simulated radioactive source   |str or dict |'Co-60' |
+| signal_len   | Length of time to simulate sampling(s)   |int or float|1024|
+| fs   | Analog sampling rate   |float |1 |
+| lambda_value   | Analog pulse count rate(cps)   |float|0.1|
+| dict_type    | Shape type model of the simulated pulse   |str|'gamma'|
+| dict_shape_params   | dict shape params   |dict|Please see [Notice](#notice)|
+| noise_unit   | Unit of noise   |str|'std'|
+| noise   | The magnitude of noise in the given unit   |float|0.01|
+| dict_size   | Shape dictionary size due to jitter   | int|100 |
+| seed   | The simulated random number seed   |int|None|
+
+**The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
+
 |**Shape parameters:**| |
+| --- | -----------|
 | t_rise   | rise time of the shape   |
 | t_fall   | fall time of the shape   |
 | shape_len   | length of the shape in samples   |
@@ -62,7 +66,6 @@ The original intention of the gamma simulator was to introduce deep learning int
 | *generate_signal_with_noise*  |*signal without noise*, noise_unit, noise|signal|The noiseless signal is superimposed on the specified unit and size of noise to obtain a real analog signal|
 
 **A large number of parameters mentioned above are used in the function introduction. In our real code, there is a high degree of integration and a large number of function reuse. Some inputs are not directly called in this function, but by calling other functions, and some output intermediate outputs are directly called by another function after the result is generated, so these temporary variables are not reflected in the description. So this function introduction is not particularly strict, but it is definitely the most suitable for readers to clarify the code logic of the introduction**
-
 ## Use
 ### Install
 Make sure you have the following libraries in your environment
