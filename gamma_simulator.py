@@ -348,7 +348,7 @@ class gamma_simulator:
                 total_hist_energy = hist_energy
                 total_hist_counts = hist_counts
             else:  # update for each source
-                total_hist_energy += hist_energy
+                total_hist_energy = hist_energy
                 total_hist_counts += hist_counts
         total_hist_counts = self.normalize_histogram(total_hist_counts)
         return total_hist_energy, total_hist_counts
