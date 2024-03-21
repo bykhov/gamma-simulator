@@ -3,6 +3,25 @@
      
 This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/) in China.Here we will give a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#Use) to see how to use it**.For any questions about the software, you can leave a message or send an email to me, I will reply as soon as possilble
 
+## Table of Contents
+
+- [Introduction](#Introduction)
+  - [What is Gamma Simulator](#what-is-gamma-simulator)
+  - [Why do we creat it](#why-do-we-creat-it)
+- [Software structure](#software-structure)
+  - [Macrostructure](#macrostructure)
+  - [Implementation structure](#implementation-structure)
+  - [Parameter description](#parameter-description)
+  - [Main function](#main-function)
+- [Use](#use)
+  - [Install](#install)
+  - [Import](#import)
+  - [Run](#run)
+- [Notice](#notice)
+  - [Shape parameter](#shape-parameter)
+  - [Plot setting](#plot-setting)
+- [Examples](#examples)
+
 ## Introduction
 ### What is Gamma Simulator?
 
