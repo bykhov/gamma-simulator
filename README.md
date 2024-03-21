@@ -1,9 +1,8 @@
 ![logo](./fig/logo.png)
 # Gamma_simulator
-     
 This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/) in China.Here we will give a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#Use) to see how to use it**.For any questions about the software, you can leave a message or send an email to me, I will reply as soon as possilble
 
-## Table of Contents
+## Contents
 
 - [Introduction](#Introduction)
   - [What is Gamma Simulator](#what-is-gamma-simulator)
@@ -21,6 +20,9 @@ This is a gamma pulse simulator jointly developed by [Shamoon College of Enginee
   - [Shape parameter](#shape-parameter)
   - [Plot setting](#plot-setting)
 - [Examples](#examples)
+- [Contributors](#contributors)
+- [Known issue](#known-issue)
+- [Todo](#todo)
 
 ## Introduction
 ### What is Gamma Simulator?
@@ -54,7 +56,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 
 **The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
 
-|**Shape parameters:**|Parameter meaning|type | eg |
+|**Shape parameters:**| |type | eg |
 | --- | -----------|-----------|-----------|
 | t_rise   | rise time of the shape   | float |4.560e-07 |
 | t_fall   | fall time of the shape   | float |6.134e-05  |
@@ -209,3 +211,8 @@ signal = simulator.generate_signal()
 ```
 
 You can see the result in [examples](./examples)
+## Contributors
+[Dima Bykhovsky](https://github.com/bykhov),[Tom Trigano](https://github.com/TomTrigano),[Zikang Chen](https://github.com/ZikangC)
+## Known issue
+  
+## Todo 
