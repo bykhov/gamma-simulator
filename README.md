@@ -1,6 +1,7 @@
 ![logo](./fig/logo.png)
 # Gamma_simulator
-This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/),CAS in China.Here we will give a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#Use) to see how to use it**.
+
+This archive contains a Python class to a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/),CAS in China. This README file provides a brief introduction to our software, including the aims and means. For more specific implementation steps of the software, please refer to our [paper](). **If you are a pure user, please jump directly to [Use](#Use) to see how to use it**.
 
 ## Contents
 
@@ -27,11 +28,11 @@ This is a gamma pulse simulator jointly developed by [Shamoon College of Enginee
 ## Introduction
 ### What is Gamma Simulator?
 
-Gamma simulator is a gamma pulse simulator with parameter customization function, you can specify the type of radioactive source and pulse count rate and other characteristics, generate pulse signals that meet the corresponding characteristics
+Gamma simulator aims to reproduce time signals typically recorded in gamma spectroscopy experiments. It includes parameter customization functions to simulate different impulse responses. You can specify the type of radioactive source you wish to use, the associated counting rate and other characteristics.
 
-### Why do we creat it?
+### Why did we create it?
 
-The original intention of the gamma simulator was to introduce deep learning into energy spectroscopy in the later stage. The use of deep learning to process pulse signals requires that the collected pulse signals have corresponding labels, which is impossible in commercial energy spectrometer. Therefore, we used the simulator to label the pulse signals while generating them, so as to facilitate the reference of deep learning methods. At the same time, simulators can greatly reduce the manpower, material and financial resources of the signal collection process, and can be used to preliminarily test signal processing methods
+The original intention of the gamma simulator is to develop a dataset of synthetic signals as close as possible to the ones recorded in real-life experiments, in order to introduce deep learning methods into energy spectroscopy in the later stage. The use of deep learning to process pulse signals requires that the collected pulse signals have corresponding labels, which is impossible in commercial energy spectrometer. Furthermore, the manual labelling of existing data is unrealistic, considering the nature of the recorded signals. Therefore, we use the simulator to label the pulse signals while generating them, so as to facilitate the reference of deep learning methods. At the same time, simulators can greatly reduce the manpower, material and financial resources of the signal collection process, and can be used to preliminarily test signal processing methods before their actual implementation.
 
 ## Software structure
 ### Macrostructure
@@ -56,7 +57,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 
 **The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
 
-|**Shape parameters:**| |type | eg |
+|**Shape parameters:**| |type | Example of a typical value |
 | --- | -----------|-----------|-----------|
 | t_rise   | rise time of the shape   | float |4.560e-07 |
 | t_fall   | fall time of the shape   | float |6.134e-05  |
@@ -77,7 +78,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 | pile_up_stat   | number of the pile-ups in the generated signal   | int | 4302 |
 | measured_snr   | measured SNR of the generated signal (dB)   |float| 66.26 |
 
-**These values are intermediate values generated during the simulation, so there are no default values. Here are some examples of these values to give the reader an idea of what these values are**
+**The values displayed in the table above are intermediate values generated during the simulation, and cannot be set up manually. Here are some examples of these values to give the reader an idea of what these values are**
 
 ### Main function
 |**Function name**|**input**|**output**|**Function action**|
@@ -213,6 +214,12 @@ signal = simulator.generate_signal()
 You can see the result in [examples](./examples)
 ## Contributors
 [Dima Bykhovsky](https://github.com/bykhov),[Tom Trigano](https://github.com/TomTrigano),[Zikang Chen](https://github.com/ZikangC)
-## Known issue
+
+## Known issues
+
+- At this moment, we cannot simulate signals with very high counting rates, because the generated pile-up signals are too long.
+- The setting of the pulse shape parameter is done manually, currently there is no method to estimate the optimal shape parameters for a given intrumentation device.
   
 ## Todo 
+
+- Estimate the parameters based on the instrumentation knowledge (see the issue above)
