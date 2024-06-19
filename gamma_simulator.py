@@ -424,7 +424,7 @@ class gamma_simulator:
             shape_time = 6 * (self.dict_shape_params['mean1'] + 3 * self.dict_shape_params['std1'])
             # calculate the rise time
             tr = ((self.dict_shape_params["mean1"] * self.dict_shape_params["mean2"]) /
-                  (self.dict_shape_params["mean1"] + self.dict_shape_params["mean2"]) *
+                  (self.dict_shape_params["mean1"] - self.dict_shape_params["mean2"]) *
                   np.log(self.dict_shape_params["mean1"] / self.dict_shape_params["mean2"]))
         elif self.dict_type == 'gamma':
             assert self.dict_shape_params['mean1'] > 0 and self.dict_shape_params['mean2'] > 0, \
