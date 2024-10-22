@@ -43,7 +43,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 | verbose_plots   | Whether images need to be output   |dict|None|
 | source   | The simulated radioactive source   |str or dict |'Co-60' |
 | signal_len   | Length of time to simulate sampling(s)   |int or float|1024|
-| fs   | Analog sampling rate   |float |1 |
+| fs   | Analog sampling rate (1e6 (μs) to 1e9 (ns) are expected)  |float |1 |
 | lambda_value   | Analog pulse count rate(cps)   |float|0.1|
 | dict_type    | Shape type model of the simulated pulse   |str|'gamma'|
 | dict_shape_params   | dict shape params   |dict|Please see [Notice](#notice)|
