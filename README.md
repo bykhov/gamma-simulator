@@ -141,6 +141,9 @@ The default option is not to draw, if you need to draw, you need to change the s
 ```
 verbose_plots={'energy':True, 'shapes': True, 'signal': True}
 ```
+
+### Custom spectrum
+If you are not satisfied with all the built-in databases or if you have specific elements that you would like to simulate, our simulator can also support any custom energy spectrum, specific examples and custom energy spectrum Settings can be viewed in [Custom_spectrum](./examples/custom_spectrum.ipynb)
 ## Example
 
 ```python
