@@ -116,7 +116,7 @@ class gamma_simulator:
         elif 'hist_energy' in source.keys() and 'hist_counts' in source.keys():
             # load the spectrum from the dictionary
             self.energy_desc = 'Custom'
-            self.hist_energy = source['hist_energy']
+            self.hist_energy = np.array(source['hist_energy'])
             self.hist_counts = self.normalize_histogram(
                 np.array(source['hist_counts'])
             )
