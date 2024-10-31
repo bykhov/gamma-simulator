@@ -1,6 +1,6 @@
 ![logo](./fig/logo.png)
 # Gamma_simulator
-This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/),CAS in China.Here we will give a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to [Developers](Developers.md) or our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#use) to see how to use it**.
+This is a gamma pulse simulator jointly developed by [Shamoon College of Engineering(SCE)](https://en.sce.ac.il/) in Israel and [Shanghai Advanced Research Institute](http://www.sari.cas.cn/), CAS in China. Here, we provide a brief introduction to our software, including the what and why. For more specific implementation steps of the software, please refer to [Developers](Developers.md) or our [paper](). Of course,**if you are a pure user, please jump directly to [Use](#use) to see how to use it**.
 
 ## Contents
 
@@ -8,7 +8,7 @@ This is a gamma pulse simulator jointly developed by [Shamoon College of Enginee
   - [Contents](#contents)
   - [Introduction](#introduction)
     - [What is Gamma Simulator?](#what-is-gamma-simulator)
-    - [Why do we creat it?](#why-do-we-creat-it)
+    - [Why do we create it?](#why-do-we-creat-it)
   - [Parameter description](#parameter-description)
     - [Parameter overview](#parameter-overview)
     - [Parametric image](#parametric-image)
@@ -28,11 +28,11 @@ This is a gamma pulse simulator jointly developed by [Shamoon College of Enginee
 ## Introduction
 ### What is Gamma Simulator?
 
-Gamma simulator is a gamma pulse simulator with parameter customization function, you can specify the type of radioactive source and pulse count rate and other characteristics, generate pulse signals that meet the corresponding characteristics
+Gamma simulator is a gamma pulse simulator with a parameter customization function, you can specify the type of radioactive source and pulse count rate and other characteristics, generate pulse signals that meet the corresponding characteristics
 
-### Why do we creat it?
+### Why do we create it?
 
-The original intention of the gamma simulator was to introduce deep learning into energy spectroscopy in the later stage. The use of deep learning to process pulse signals requires that the collected pulse signals have corresponding labels, which is impossible in commercial energy spectrometer. Therefore, we used the simulator to label the pulse signals while generating them, so as to facilitate the reference of deep learning methods. At the same time, simulators can greatly reduce the manpower, material and financial resources of the signal collection process, and can be used to preliminarily test signal processing methods
+The original intention of the gamma simulator was to introduce deep learning into energy spectroscopy in the later stage. The use of deep learning to process pulse signals requires that the collected pulse signals have corresponding labels, which is impossible in a commercial energy spectrometer. Therefore, we used the simulator to label the pulse signals while generating them, so as to facilitate the reference of deep learning methods. At the same time, simulators can greatly reduce the manpower, material and financial resources of the signal collection process, and can be used to preliminarily test signal processing methods
 
 
 ## Parameter description
@@ -52,19 +52,20 @@ The original intention of the gamma simulator was to introduce deep learning int
 | dict_size   | Shape dictionary size due to jitter   | int|100 |
 | seed   | The simulated random number seed   |int|None|
 
-**The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. We use the standard International System of Units (SI) along the paper.  The code parameters follow the same notation, e.g. seconds for time, Hz for frequency, etc.  We have also clarified that issue by adding the corresponding comments to the listings. We also give a visual description in the [parametric image](#parametric-image). For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
+The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. The code parameters follow the standard International System of Units (SI) notation, e.g. seconds for time, Hz for frequency, etc.  We also give a visual description in the [parametric image](#parametric-image). For specific parameter Settings in applications, please refer to the [example section](#example), more specific parameter Settings and parameter tests are presented in the [example folder](/examples)
 
 ### Parametric image
 ![paraima](./fig/parameterpic.png)
-1. Pulse Shape: Representing the shape of each pulse, our simulator can simulate pulses of gamma shape and double exponential shape, as determined by the parameter **dict_type**, Pulse 1 is selected from the shape dictionary as shown in the image below
+1. Pulse Shape: Representing the shape of each pulse, our simulator can simulate pulses of gamma shape and double exponential shape, as determined by the parameter `dict_type`, Pulse 1 is selected from the shape dictionary as shown in the image below
 ![shapes](./fig/shapes.png)
-In the figure,1.1 represents the number of pulse shapes contained in the pulse shape dictionary, as determined by the **dict_size** parameter,1.2 represents the pulse length, including the pulse rise time and pulse fall time, which are determined by the **dict_shape_params** parameter
+In the figure, 1.1 represents the number of pulse shapes contained in the pulse shape dictionary, as determined by the `dict_size` parameter, 1.2 represents the pulse length, including the pulse rise time and pulse fall time, which are determined by the `dict_shape_params` parameter.
 
-2. Pulse interval time: The time interval between two pulses, which is randomly generated by the Poisson process is determined by parameter **lambda_value**.More informally, lambda_value represents the average number of pulses arriving per second
+2. Pulse interval time: The time interval between two pulses, which is randomly generated by the Poisson process, is determined by the parameter `lambda_value`. More informally, `lambda_value` represents the average number of pulses arriving per second.
 
-3. Noise: The noise of the signal is present in every moment of the signal is determined by the **noise_unit** and **noise** parameters.If we zoom in on 3 we get the image below
+3. Noise: The noise of the signal is present at every moment of the signal and is determined by the `noise_unit` and `noise` parameters. If we zoom in on 3, we get the image below
 ![noise](./fig/noise.png)
-Where the unit of noise is "std", 3.1 clearly represents the amplitude of the noise determined by the parameter **noise**
+Where the unit of noise is "std", 3.1 clearly represents the amplitude of the noise determined by the parameter `noise`.
+
 ## Use
 ### Install
 Make sure you have the following libraries in your environment
@@ -84,11 +85,11 @@ from gamma_simulator.gamma_simulator import gamma_simulator
 ```
 
 ### Run
-Step 1.Creat an instance
+Step 1. Create an instance
 ```python
 simulator = gamma_simulator()
 ```
-Step 2.Define parameters
+Step 2. Define parameters
 ```python
 simulator = gamma_simulator(verbose=True,
                             verbose_plots={'shapes': True, 'signal': True},
@@ -106,7 +107,7 @@ simulator = gamma_simulator(verbose=True,
                             dict_size=10,
                             seed=42)
 ```
-Step 3.Creat the signal
+Step 3. Create the signal
 ```python
 signal = simulator.generate_signal()
 ```
@@ -132,9 +133,9 @@ dict_shape_params={'mean1': 1e-5,
 ```
 ### Plot setting
 Our simulator supports drawing a variety of graphs, including energy, shape, signal and spectrum.
-* Energy: Ideal energy spectrum of the drawn signal source (simulator built-in database)
-* Shape: Draws a dictionary set of all possible signal shapes
-* Signal: When the length of the resulting signal is less than 2000, the generated signal is drawn, and when the length is greater than 2000, the first 2000 sampling points are drawn
+* Energy: Ideal energy spectrum of the drawn signal source (simulator built-in database).
+* Shape: Draw a dictionary set of all possible signal shapes.
+* Signal: When the length of the resulting signal is less than 2000, the generated signal is drawn, and when the length is greater than 2000, the first 2000 sampling points are drawn.
 
 
 The default option is not to draw, if you need to draw, you need to change the specified value in the parameter definition to True
@@ -194,12 +195,10 @@ Pre-defined random seed 42 is used
 Process finished with exit code 0
 ```
 
-You can see more exampes and tests in [examples](./examples)
+You can see more examples and tests in [examples](./examples)
 ## Contributors
-[Dima Bykhovsky](https://github.com/bykhov),[Tom Trigano](https://github.com/TomTrigano),[Zikang Chen](https://github.com/ZikangC)
-## Known issue
-  * Cannot simulate high count rates（The length of each pulse is too long）
-  * The setting of the pulse length time parameter is too supervisor
+[Dima Bykhovsky](https://github.com/bykhov), [Tom Trigano](https://github.com/TomTrigano), [Zikang Chen](https://github.com/ZikangC)
+
 ## Todo 
   * Use simulators to generate datasets for deep learning
   * (Possibly) Try to give a way to set parameters so that users can customize them to their needs
