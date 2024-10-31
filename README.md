@@ -52,7 +52,7 @@ The original intention of the gamma simulator was to introduce deep learning int
 | dict_size   | Shape dictionary size due to jitter   | int|100 |
 | seed   | The simulated random number seed   |int|None|
 
-**The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. We also give a visual description in the [parametric image](#parametric-image). For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
+**The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. We use the standard International System of Units (SI) along the paper.  The code parameters follow the same notation, e.g. seconds for time, Hz for frequency, etc.  We have also clarified that issue by adding the corresponding comments to the listings. We also give a visual description in the [parametric image](#parametric-image). For specific parameter Settings in applications, please refer to the [example section](#examples) ,more specific parameter Settings and parameter tests are presented in the [example folder](/examples)**
 
 ### Parametric image
 ![paraima](./fig/parameterpic.png)
