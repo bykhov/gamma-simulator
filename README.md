@@ -39,18 +39,18 @@ The original intention of the gamma simulator was to introduce deep learning int
 ### Parameter overview
 |**Setting Parameters:**||type|Default value|
 | --- | -----------|-----------|-----------|
-| verbose   | Whether to output detailed information   |bool|False |
-| verbose_plots   | Whether images need to be output   |dict|None|
-| source   | The simulated radioactive source   |str or dict |'Co-60' |
-| signal_len   | Length of time to simulate sampling (s)   |int or float|1024|
-| fs   | Analog sampling rate (Hz, 1e6 to 1e9 are expected)  |float |1 |
-| lambda_value   | Analog pulse count rate (cps)   |float|0.1|
-| dict_type    | Shape type model of the simulated pulse   |str|'gamma'|
-| dict_shape_params   | dict shape params   |dict|Please see [Notice](#notice)|
-| noise_unit   | Unit of noise   |str|'std'|
-| noise   | The magnitude of noise in the given unit   |float|0.01|
-| dict_size   | Shape dictionary size due to jitter   | int|100 |
-| seed   | The simulated random number seed   |int|None|
+| `verbose`   | Whether to output detailed information   |bool|False |
+| `verbose_plots`   | Whether images need to be output   |dict|None|
+| `source`   | The simulated radioactive source   |str or dict |'Co-60' |
+| `signal_len`   | Length of time to simulate sampling (s)   |int or float|1024|
+| `fs`   | Analog sampling rate (Hz, 1e6 to 1e9 are expected)  |float |1 |
+| `lambda_value`   | Analog pulse count rate (cps)   |float|0.1|
+| `dict_type`    | Shape type model of the simulated pulse   |str|'gamma'|
+| `dict_shape_params`   | dict shape params   |dict|Please see [Notice](#notice)|
+| `noise_unit`   | Unit of noise   |str|'std'|
+| `noise`   | The magnitude of noise in the given unit   |float|0.01|
+| `dict_size`   | Shape dictionary size due to jitter   | int|100 |
+| `seed`   | The simulated random number seed   |int|None|
 
 The above parameters can be set and customized by users. The chart shows the default values of parameters and draws discrete pulse signals. The code parameters follow the standard International System of Units (SI) notation, e.g. seconds for time, Hz for frequency, etc.  We also give a visual description in the [parametric image](#parametric-image). For specific parameter Settings in applications, please refer to the [example section](#example), more specific parameter Settings and parameter tests are presented in the [example folder](/examples)
 
