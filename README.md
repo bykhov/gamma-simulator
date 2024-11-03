@@ -191,8 +191,6 @@ Actual pile-up probability is 0.470 with 5424 non-pile-up events out of 10236 ev
 Noise level: ±0.001 per sample
 Measured SNR: 64.92 dB
 Pre-defined random seed 42 is used
-
-Process finished with exit code 0
 ```
 
 You can see more examples and tests in [examples](./examples)
